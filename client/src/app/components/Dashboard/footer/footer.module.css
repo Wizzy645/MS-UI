@@ -1,0 +1,28 @@
+.container {
+  background-color: #111;
+  padding: 1rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #aaa;
+  font-size: 0.875rem;
+}
+
+.logo {
+  font-weight: 600;
+  color: white;
+}
+
+.rights {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 0.9rem;
+}
