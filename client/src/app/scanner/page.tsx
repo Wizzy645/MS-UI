@@ -38,7 +38,7 @@ interface Session {
   }[];
 }
 
-export default function ScannerPage({ user }: { user: User }) {
+export default function Scanner({ user }: { user: User }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
