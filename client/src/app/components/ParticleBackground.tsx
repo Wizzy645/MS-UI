@@ -1,11 +1,19 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 
+// Define the type for each circle
+type Circle = {
+  cx: number;
+  cy: number;
+  r: number;
+  opacity: number;
+};
+
 export default function ParticleBackground() {
-  const [circles, setCircles] = useState([]);
+  const [circles, setCircles] = useState<Circle[]>([]);
 
   useEffect(() => {
-    const generatedCircles = Array.from({ length: 40 }).map(() => ({
+    const generatedCircles: Circle[] = Array.from({ length: 40 }).map(() => ({
       cx: Math.random() * 800,
       cy: Math.random() * 600,
       r: Math.random() * 2 + 1,
@@ -34,8 +42,8 @@ export default function ParticleBackground() {
         }
       `}</style>
       {circles.map((circle, i) => {
-        const duration = 5 + Math.random() * 5; // 5 to 10 seconds
-        const delay = Math.random() * 5; // 0 to 5 seconds
+        const duration = 5 + Math.random() * 5;
+        const delay = Math.random() * 5;
         return (
           <circle
             key={i}
@@ -43,7 +51,7 @@ export default function ParticleBackground() {
             cy={circle.cy}
             r={circle.r}
             fill="white"
-            fillOpacity={0.15}
+            fillOpacity={circle.opacity}
             className="float"
             style={{
               animationDuration: `${duration}s`,
