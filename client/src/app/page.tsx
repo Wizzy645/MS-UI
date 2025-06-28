@@ -11,6 +11,8 @@ import trustAnimation from "@/animations/trust.json";
 import { ClipboardType, BrainCircuit, ShieldCheck } from "lucide-react";
 import ParticleBackground from "./components/ParticleBackground";
 import RedesignedTestimonials from "./components/RedesignedTestimonials";
+import Image from "next/image";
+
 
 export default function Home() {
   useEffect(() => {
@@ -143,11 +145,16 @@ export default function Home() {
             Visualize real-time scam trends, threat activity, and detection data — all in one analyst-focused dashboard.
           </p>
           <div className="relative max-w-4xl mx-auto" data-aos="zoom-in">
-            <img
-              src="/dashboard-preview.png"
-              alt="Dashboard Preview"
-              className="w-full rounded-xl shadow-lg blur-sm hover:blur-none transition duration-500"
-            />
+           <div className="relative w-full h-[500px]">
+  <Image
+    src="public\Annotation 2025-06-28 223258.png"
+    alt="Dashboard Preview"
+    fill
+    className="object-cover rounded-xl shadow-lg blur-sm hover:blur-none transition duration-500"
+    priority
+  />
+</div>
+
             <div className="absolute top-4 left-4 bg-purple-600/90 text-white text-xs px-3 py-1 rounded shadow-lg animate-float-slow z-20">
               Scam Surge: +42%
             </div>

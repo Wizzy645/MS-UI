@@ -12,7 +12,6 @@ import {
   MdHelpOutline,
   MdReportProblem,
   MdLogout,
-  MdStars,
   MdOutlineShield,
   MdOutlineUpgrade,
   MdGroupAdd

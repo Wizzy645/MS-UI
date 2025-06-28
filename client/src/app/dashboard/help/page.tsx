@@ -46,8 +46,10 @@ export default function HelpCenter() {
         alert("There was a problem submitting the form.");
       }
     } catch (error) {
-      alert("Something went wrong. Please try again later.");
-    } finally {
+  console.error("Form submission error:", error);
+  alert("Something went wrong. Please try again later.");
+}
+ finally {
       setLoading(false);
     }
   };

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  MdInsights,
   MdOutlineDownload,
   MdTimeline,
   MdBugReport,

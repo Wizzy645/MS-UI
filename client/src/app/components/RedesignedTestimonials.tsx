@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import Image from "next/image"; // ✅ Import next/image
 
 const testimonials = [
   {
@@ -55,7 +56,6 @@ export default function RedesignedTestimonials() {
           Trusted by Nigerians
         </h2>
 
-        {/* Arrows */}
         <button
           onClick={prev}
           aria-label="Previous testimonial"
@@ -86,10 +86,12 @@ export default function RedesignedTestimonials() {
           >
             <Quote className="absolute top-4 left-4 text-purple-400 opacity-20 w-10 h-10" />
             <div className="flex justify-center mb-6">
-              <img
+              <Image
                 src={testimonial.avatar}
                 alt={`Avatar of ${testimonial.name}`}
-                className="w-20 h-20 rounded-full border-4 border-purple-400 shadow object-cover animate-float"
+                width={80}
+                height={80}
+                className="rounded-full border-4 border-purple-400 shadow object-cover animate-float"
               />
             </div>
             <blockquote className="text-gray-300 italic text-lg leading-relaxed mb-6 relative">

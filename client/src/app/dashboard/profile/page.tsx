@@ -12,6 +12,7 @@ import {
   MdVisibilityOff,
   MdCheckCircle,
 } from "react-icons/md";
+import Image from "next/image";
 
 export default function AdminProfilePage() {
   const [email, setEmail] = useState("admin@mamasecure.io");
@@ -60,11 +61,14 @@ export default function AdminProfilePage() {
       {/* Top Section */}
       <div className="flex flex-wrap items-center gap-6 mb-10">
         <div className="relative">
-          <img
-            src={avatar || "/user-profile-avatar-png.webp"}
-            alt="Avatar"
-            className="w-32 h-32 rounded-full object-cover border-4 border-purple-600"
-          />
+          <Image
+  src={avatar || "/user-profile-avatar-png.webp"}
+  alt="Avatar"
+  width={128}
+  height={128}
+  unoptimized={!!avatar} // Use unoptimized for uploaded or external images
+  className="rounded-full object-cover border-4 border-purple-600"
+/>
           <label className="absolute bottom-0 right-0 bg-purple-600 p-2 rounded-full cursor-pointer hover:bg-purple-500 transition">
             <MdPhotoCamera size={18} />
             <input

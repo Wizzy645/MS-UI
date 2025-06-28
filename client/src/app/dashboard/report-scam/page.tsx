@@ -5,7 +5,7 @@ import {
   MdReportProblem,
   MdCheckCircle,
   MdShield,
-  MdInfoOutline,
+ 
 } from "react-icons/md";
 
 export default function ReportScamPage() {

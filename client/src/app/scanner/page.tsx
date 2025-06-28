@@ -6,7 +6,7 @@ import orbAnimation from "@/animations/orb.json";
 import typingDots from "@/animations/typing.json";
 import { motion } from "framer-motion";
 import { MdHistory, MdAdd } from "react-icons/md";
-import { PiCarProfileBold } from "react-icons/pi";
+
 import ProfileDropdown from "../components/ProfileDropdown";
 
 
@@ -167,27 +167,7 @@ useEffect(() => {
       inputRef.current?.focus();
     }, 2500);
   };
-
-  const deleteSession = (id: string) => {
-    setSessions((prev) => {
-      const filtered = prev.filter((s) => s.id !== id);
-      if (currentSessionId === id && filtered.length > 0) {
-        setCurrentSessionId(filtered[0].id);
-      } else if (filtered.length === 0) {
-        startNewSession();
-      }
-      return filtered;
-    });
-  };
-
-  const renameSession = (id: string) => {
-    const label = prompt("Rename session:");
-    if (label) {
-      setSessions((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, label } : s))
-      );
-    }
-  };
+  
 
   if (!hasMounted) {
     return (
