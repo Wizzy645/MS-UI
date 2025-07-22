@@ -7,7 +7,9 @@ import orbAnimation from "@/animations/orb.json";
 import typingDots from "@/animations/typing.json";
 import { motion } from "framer-motion";
 import { MdHistory, MdAdd } from "react-icons/md";
-import ProfileDropdown from "./ProfileDropdown"; // Make sure the path is correct
+import ProfileDropdown from "./ProfileDropdown";
+import SessionCard from "./SessionCard";
+import EditSessionModal from "./EditSessionModal";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -45,6 +47,7 @@ export default function Scanner({ user }: { user: { name?: string } }) {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
+  const [editingSession, setEditingSession] = useState<{ id: string; name: string } | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -132,6 +135,47 @@ useEffect(() => {
     setCurrentSessionId(id);
     setInput("");
     inputRef.current?.focus();
+  };
+
+  const handleEditSessionName = (id: string) => {
+    const session = sessions.find((s) => s.id === id);
+    if (session) {
+      setEditingSession({ id, name: session.label });
+    }
+  };
+
+  const handleDeleteSession = (id: string) => {
+    if (sessions.length <= 1) {
+      alert("Cannot delete the last session. At least one session must remain.");
+      return;
+    }
+
+    if (confirm("Are you sure you want to delete this session? This action cannot be undone.")) {
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+
+      // If we're deleting the active session, switch to another one
+      if (currentSessionId === id) {
+        const remainingSessions = sessions.filter((s) => s.id !== id);
+        if (remainingSessions.length > 0) {
+          setCurrentSessionId(remainingSessions[0].id);
+        }
+      }
+    }
+  };
+
+  const handleSaveSessionName = (newName: string) => {
+    if (editingSession) {
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === editingSession.id ? { ...s, label: newName.trim() } : s
+        )
+      );
+      setEditingSession(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSession(null);
   };
 
   const handleScan = () => {
@@ -241,21 +285,21 @@ useEffect(() => {
 </div>
 
 
-          <ul className="space-y-2 flex-1 overflow-auto">
+          <div className="space-y-2 flex-1 overflow-auto">
             {sessions.map((s) => (
-              <li
+              <SessionCard
                 key={s.id}
-                className={`group p-2 rounded cursor-pointer text-sm truncate ${
-                  s.id === currentSessionId
-                    ? "bg-purple-700 text-white font-semibold"
-                    : "bg-white/5 hover:bg-white/10"
-                }`}
+                id={s.id}
+                label={s.label}
+                isActive={s.id === currentSessionId}
+                scanCount={s.scans?.length || 0}
+                lastUpdated={s.scans?.length > 0 ? new Date().toISOString() : undefined}
                 onClick={() => setCurrentSessionId(s.id)}
-              >
-                {s.label}
-              </li>
+                onEditName={handleEditSessionName}
+                onDelete={handleDeleteSession}
+              />
             ))}
-          </ul>
+          </div>
 
           <button
             onClick={startNewSession}
@@ -368,9 +412,14 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* Edit Session Modal */}
+      <EditSessionModal
+        isOpen={editingSession !== null}
+        sessionName={editingSession?.name || ""}
+        onSave={handleSaveSessionName}
+        onCancel={handleCancelEdit}
+      />
     </div>
   );
 }
-
-
-
