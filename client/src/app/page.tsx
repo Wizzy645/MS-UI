@@ -147,7 +147,7 @@ export default function Home() {
           <div className="relative max-w-4xl mx-auto" data-aos="zoom-in">
            <div className="relative w-full h-[500px]">
   <Image
-    src="public\Annotation 2025-06-28 223258.png"
+    src="/Annotation 2025-06-28 223258.png"
     alt="Dashboard Preview"
     fill
     className="object-cover rounded-xl shadow-lg blur-sm hover:blur-none transition duration-500"
@@ -275,4 +275,3 @@ export default function Home() {
     </main>
   );
 }
-

@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
+
+  // Configure external image domains
+  images: {
+    domains: ['randomuser.me'],
+  },
+
   // Add any other config options here, if needed
   reactStrictMode: true,
 };
