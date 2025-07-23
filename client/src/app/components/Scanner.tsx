@@ -263,20 +263,18 @@ useEffect(() => {
     <ProfileDropdown userEmail={user?.name || "unknown@domain.com"} />
     <button
       onClick={() => setSidebarOpen(false)}
-      className="p-1 rounded hover:bg-white/10 transition"
-      title="Collapse"
+      className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
+      title="Close Menu"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 text-white"
-        viewBox="0 0 20 20"
-        fill="currentColor"
+        className="h-5 w-5 text-white hover:text-red-400 transition-colors"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
       >
-        <path
-          fillRule="evenodd"
-          d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414z"
-          clipRule="evenodd"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   </div>
