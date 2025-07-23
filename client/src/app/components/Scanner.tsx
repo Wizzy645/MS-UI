@@ -182,6 +182,31 @@ useEffect(() => {
 
   const handleScan = () => {
     if (!input.trim() || !currentSessionId) return;
+
+    // Check if user is authenticated
+    if (!user?.isAuthenticated) {
+      // Show authentication required notification
+      const notification = document.createElement('div');
+      notification.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <div class="text-yellow-400">⚠️</div>
+          <div>
+            <div class="font-semibold">Authentication Required</div>
+            <div class="text-sm text-gray-300">Please sign in to use the scanner</div>
+          </div>
+        </div>
+      `;
+      notification.className = 'fixed top-4 right-4 bg-yellow-600/90 text-white px-6 py-4 rounded-xl shadow-lg z-[9999] transition-opacity max-w-sm';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 4000);
+
+      return;
+    }
+
     setLoading(true);
 
     const fakeResult: ScanResult = {
