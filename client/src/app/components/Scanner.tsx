@@ -425,8 +425,13 @@ useEffect(() => {
             />
             <button
               onClick={handleScan}
-              disabled={!input.trim()}
-              className="absolute top-1/2 right-3 transform -translate-y-1/2 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-200 transition disabled:opacity-50"
+              disabled={!input.trim() || !user?.isAuthenticated}
+              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition disabled:opacity-50 ${
+                user?.isAuthenticated
+                  ? 'bg-white text-black hover:bg-gray-200'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+              title={!user?.isAuthenticated ? 'Please sign in to scan' : 'Scan content'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
