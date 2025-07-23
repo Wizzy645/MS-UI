@@ -231,20 +231,18 @@ useEffect(() => {
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed left-4 top-4 z-[70] p-2 bg-[#111] rounded-md shadow-lg hover:bg-[#222] transition-all"
-          title="Expand"
+          className="fixed left-4 top-4 z-[70] p-3 bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl shadow-xl hover:from-purple-500 hover:to-purple-600 transition-all duration-300 border border-purple-400/30"
+          title="Open Menu"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 text-white"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
           >
-            <path
-              fillRule="evenodd"
-              d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
-              clipRule="evenodd"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       )}
