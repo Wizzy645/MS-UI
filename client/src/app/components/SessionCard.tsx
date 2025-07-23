@@ -178,8 +178,9 @@ export default function SessionCard({
               className="w-56 sm:w-64 bg-[#1e1e1e] border border-gray-700 rounded-xl shadow-xl overflow-hidden pointer-events-auto animate-fade-in-down"
               style={{
                 position: 'absolute',
-                top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
-                right: window.innerWidth - (buttonRef.current ? buttonRef.current.getBoundingClientRect().right : 0),
+                top: dropdownPosition.top,
+                right: dropdownPosition.right,
+                maxHeight: `calc(100vh - ${dropdownPosition.top + 20}px)`,
               }}
             >
               {/* Session Info Header */}
