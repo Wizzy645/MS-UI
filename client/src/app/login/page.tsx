@@ -104,6 +104,18 @@ export default function AuthPage() {
           </AnimatePresence>
         </motion.div>
 
+        {/* Mobile Welcome Section */}
+        <div className="md:hidden w-full bg-gradient-to-r from-purple-700/30 to-indigo-700/30 p-6 text-center text-white">
+          <h2 className="text-2xl font-bold mb-2">
+            {isLogin ? "Welcome Back" : "Join MamaSecure"}
+          </h2>
+          <p className="text-gray-200 text-sm">
+            {isLogin
+              ? "Log in to access your AI-powered scam detection."
+              : "Sign up to stay protected from scams."}
+          </p>
+        </div>
+
         {/* Form Panel */}
         <motion.div
           animate={{ x: isLogin ? "100%" : "0%" }}
