@@ -251,7 +251,7 @@ useEffect(() => {
 
       {/* Sidebar */}
       <div
-        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 p-4 overflow-y-auto transition-all duration-300 ease-in-out z-30 ${
+        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 p-4 overflow-y-auto no-scrollbar transition-all duration-300 ease-in-out z-30 ${
           sidebarOpen ? "w-72" : "w-0"
         }`}
       >
