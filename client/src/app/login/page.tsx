@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa";
 import ParticleBackground from "@/app/components/ParticleBackground";
 import { useUser } from "../context/UserContext";
 import { useRouter } from "next/navigation";
