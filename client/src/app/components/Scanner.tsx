@@ -262,13 +262,7 @@ useEffect(() => {
   </h2>
   
   <div className="mt-6 pt-4 flex justify-center">
-    <ProfileDropdown
-      user={{
-        name: user?.name || "Guest",
-        email: user?.name?.includes("@") ? user.name : "guest@example.com",
-        isAuthenticated: user?.name && !user.name.includes("Guest") && !user.name.includes("unknown")
-      }}
-    />
+    <ProfileDropdown user={user} />
     <button
       onClick={() => setSidebarOpen(false)}
       className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
