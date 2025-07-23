@@ -67,6 +67,37 @@ export default function AuthPage() {
     }, 1500);
   };
 
+  const handleGoogleSignIn = () => {
+    setLoading(true);
+    setTimeout(() => {
+      // Simulate Google authentication success
+      const userData = {
+        id: 'google_' + Date.now().toString(),
+        name: 'Google User',
+        email: 'user@gmail.com',
+        avatar: 'G',
+        joinedAt: new Date().toISOString()
+      };
+
+      login(userData);
+      setLoading(false);
+
+      // Show success notification
+      const notification = document.createElement('div');
+      notification.textContent = 'Successfully signed in with Google!';
+      notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[9999] transition-opacity';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 2000);
+
+      // Redirect to scanner or dashboard
+      router.push('/scanner');
+    }, 1500);
+  };
+
   return (
     <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center px-4 relative overflow-hidden cursor-crosshair">
       <ParticleBackground />
