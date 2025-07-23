@@ -149,12 +149,13 @@ export default function SessionCard({
         <button
           ref={buttonRef}
           onClick={handleDropdownToggle}
-          className={`p-1.5 rounded-md transition-colors duration-200 ${
+          className={`p-2 rounded-lg transition-all duration-200 ${
             isDropdownOpen
-              ? "bg-white/20"
-              : "hover:bg-white/10 opacity-0 group-hover:opacity-100"
+              ? "bg-white/20 scale-110"
+              : "hover:bg-white/10 opacity-0 group-hover:opacity-100 hover:scale-110"
           } ${isActive ? "text-white" : "text-gray-400"}`}
           aria-label="Session options"
+          title="Session options"
         >
           <FiMoreVertical className="w-4 h-4" />
         </button>
@@ -163,23 +164,51 @@ export default function SessionCard({
         {isDropdownOpen && (
           <div
             ref={dropdownRef}
-            className="absolute right-0 top-full mt-1 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-50 py-1"
+            className="fixed inset-0 z-[100] flex items-start justify-end p-4 pointer-events-none"
           >
-            <button
-              onClick={handleEditClick}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors duration-150"
+            <div
+              className="w-56 sm:w-64 bg-[#1e1e1e] border border-gray-700 rounded-xl shadow-xl overflow-hidden pointer-events-auto animate-fade-in-down"
+              style={{
+                position: 'absolute',
+                top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
+                right: window.innerWidth - (buttonRef.current ? buttonRef.current.getBoundingClientRect().right : 0),
+              }}
             >
-              <FiEdit2 className="w-4 h-4" />
-              Edit session name
-            </button>
-            
-            <button
-              onClick={handleDeleteClick}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150"
-            >
-              <FiTrash2 className="w-4 h-4" />
-              Delete session
-            </button>
+              {/* Session Info Header */}
+              <div className="px-4 py-3 bg-gradient-to-r from-purple-600/20 to-purple-700/20 border-b border-gray-700">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                    isActive ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white' : 'bg-gray-600 text-gray-300'
+                  }`}>
+                    {scanCount || 0}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-white truncate max-w-[150px]" title={label}>{label}</div>
+                    <div className="text-xs text-gray-400">
+                      {scanCount} scan{scanCount !== 1 ? 's' : ''} {lastUpdated && `• ${formatLastUpdated(lastUpdated)}`}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Menu Options */}
+              <div className="py-2">
+                <button
+                  onClick={handleEditClick}
+                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
+                >
+                  <FiEdit2 className="mr-3 w-4 h-4" /> Edit Name
+                </button>
+                <div className="border-t border-gray-700 mt-2 pt-2">
+                  <button
+                    onClick={handleDeleteClick}
+                    className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-600/20 flex items-center transition-colors"
+                  >
+                    <FiTrash2 className="mr-3 w-4 h-4" /> Delete Session
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
