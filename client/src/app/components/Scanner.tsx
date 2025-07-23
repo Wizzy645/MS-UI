@@ -345,6 +345,23 @@ useEffect(() => {
     <h2 className="text-xl text-purple-400">
       Stay protected with AI-powered scam detection
     </h2>
+    {!user?.isAuthenticated && (
+      <div className="mt-8 p-6 bg-yellow-600/20 border border-yellow-500/30 rounded-xl max-w-md mx-auto">
+        <div className="flex items-center justify-center mb-3">
+          <div className="text-yellow-400 text-2xl">🔐</div>
+        </div>
+        <h3 className="text-lg font-semibold text-yellow-400 mb-2">Authentication Required</h3>
+        <p className="text-gray-300 text-sm mb-4">
+          Sign in to access the AI-powered scam scanner and protect yourself from threats.
+        </p>
+        <a
+          href="/login"
+          className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+        >
+          Sign In / Register
+        </a>
+      </div>
+    )}
   </div>
 )}
 
