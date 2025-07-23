@@ -405,16 +405,23 @@ useEffect(() => {
           <div className="relative w-full">
             <textarea
               ref={inputRef}
-              className="w-full p-4 rounded-xl bg-transparent text-white border border-gray-600 placeholder-gray-400 shadow-md resize-none h-24 pr-24"
-              placeholder="Paste a suspicious link or message..."
+              className={`w-full p-4 rounded-xl bg-transparent text-white border border-gray-600 placeholder-gray-400 shadow-md resize-none h-24 pr-24 ${
+                !user?.isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              placeholder={
+                user?.isAuthenticated
+                  ? "Paste a suspicious link or message..."
+                  : "Please sign in to use the scanner..."
+              }
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => user?.isAuthenticated && setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey && user?.isAuthenticated) {
                   e.preventDefault();
                   handleScan();
                 }
               }}
+              disabled={!user?.isAuthenticated}
             />
             <button
               onClick={handleScan}
