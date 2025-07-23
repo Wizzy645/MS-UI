@@ -78,31 +78,18 @@ export default function AuthPage() {
         className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-5xl min-h-[500px] md:h-[580px] overflow-hidden rounded-2xl bg-[#1a1a1a] border border-purple-900/40 shadow-xl flex flex-col md:flex-row"
       >
         {/* Welcome Panel */}
-        <motion.div
-          animate={{ x: isLogin ? 0 : "100%" }}
-          transition={{ duration: 0.8 }}
-          className="hidden md:flex absolute top-0 left-0 w-1/2 h-full bg-gradient-to-tr from-purple-700/40 to-indigo-700/40 text-white p-6 lg:p-12 z-20 flex-col justify-center items-center"
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isLogin ? "loginText" : "signupText"}
-              initial={{ opacity: 0, x: isLogin ? -30 : 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isLogin ? 30 : -30 }}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
-              <h2 className="text-4xl font-bold mb-3">
-                {isLogin ? "Welcome Back" : "Join the Revolution"}
-              </h2>
-              <p className="text-gray-200 text-sm max-w-sm leading-relaxed">
-                {isLogin
-                  ? "Log in to access your AI-powered threat control panel."
-                  : "Sign up to enter a smarter, more secure world."}
-              </p>
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
+        <div className="hidden md:flex absolute top-0 left-0 w-1/2 h-full bg-gradient-to-tr from-purple-700/40 to-indigo-700/40 text-white p-6 lg:p-12 z-20 flex-col justify-center items-center">
+          <div className="text-center">
+            <h2 className="text-4xl font-bold mb-3">
+              {isLogin ? "Welcome Back" : "Join the Revolution"}
+            </h2>
+            <p className="text-gray-200 text-sm max-w-sm leading-relaxed">
+              {isLogin
+                ? "Log in to access your AI-powered threat control panel."
+                : "Sign up to enter a smarter, more secure world."}
+            </p>
+          </div>
+        </div>
 
         {/* Mobile Welcome Section */}
         <div className="md:hidden w-full bg-gradient-to-r from-purple-700/30 to-indigo-700/30 p-6 text-center text-white">
