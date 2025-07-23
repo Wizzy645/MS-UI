@@ -4,15 +4,19 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import ParticleBackground from "@/app/components/ParticleBackground";
+import { useUser } from "../context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useUser();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
-    username: "",
+    fullname: "",
     email: "",
     password: "",
   });
@@ -27,8 +31,8 @@ export default function AuthPage() {
     e.preventDefault();
 
     // Basic validation
-    const { username, email, password } = formData;
-    if (!username || !password || (!isLogin && !email)) {
+    const { fullname, email, password } = formData;
+    if (!fullname || !password || (!isLogin && !email)) {
       setShake(true);
       setTimeout(() => setShake(false), 500);
       return;
@@ -36,8 +40,30 @@ export default function AuthPage() {
 
     setLoading(true);
     setTimeout(() => {
+      // Simulate authentication success
+      const userData = {
+        id: Date.now().toString(),
+        name: fullname,
+        email: email || `${fullname.toLowerCase().replace(/\s+/g, '')}@example.com`,
+        joinedAt: new Date().toISOString()
+      };
+
+      login(userData);
       setLoading(false);
-      alert(isLogin ? "Logged In!" : "Account Created!");
+
+      // Show success notification
+      const notification = document.createElement('div');
+      notification.textContent = isLogin ? 'Welcome back!' : 'Account created successfully!';
+      notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[9999] transition-opacity';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 2000);
+
+      // Redirect to scanner or dashboard
+      router.push('/scanner');
     }, 1500);
   };
 
@@ -103,9 +129,9 @@ export default function AuthPage() {
                 <FaUser className="absolute top-3 left-3 text-purple-400" />
                 <input
                   name="fullname"
-                  value={formData.username}
+                  value={formData.fullname}
                   onChange={handleChange}
-                  placeholder="Fullname"
+                  placeholder="Full Name"
                   className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1e1e1e] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   required
                 />
