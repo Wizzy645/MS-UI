@@ -235,6 +235,24 @@ export default function AuthPage() {
                 )}
               </button>
 
+              {/* Divider */}
+              <div className="flex items-center justify-center space-x-4 my-4">
+                <div className="flex-1 h-px bg-gray-600"></div>
+                <span className="text-gray-400 text-sm">or</span>
+                <div className="flex-1 h-px bg-gray-600"></div>
+              </div>
+
+              {/* Google Sign-In Button */}
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                type="button"
+                className="w-full py-3 rounded-xl bg-white text-gray-800 font-semibold transition flex items-center justify-center gap-3 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FaGoogle className="text-red-500" />
+                {loading ? "Signing in..." : `Continue with Google`}
+              </button>
+
               <p className="text-sm text-gray-400 text-center">
                 {isLogin ? "New here?" : "Already a user?"}{" "}
                 <button
