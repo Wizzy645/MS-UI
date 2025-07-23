@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import ParticleBackground from "./components/ParticleBackground";
+import { UserProvider } from "./context/UserContext";
 
 export default function RootLayout({
   children,
@@ -29,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ParticleBackground />
-        {children}
+        <UserProvider>
+          <ParticleBackground />
+          {children}
+        </UserProvider>
       </body>
     </html>
   );
