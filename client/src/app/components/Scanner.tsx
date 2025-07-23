@@ -259,8 +259,14 @@ useEffect(() => {
     <MdHistory className="text-purple-400" /> Sessions
   </h2>
   
-  <div className="mt-6  pt-4 flex justify-center">
-    <ProfileDropdown userEmail={user?.name || "unknown@domain.com"} />
+  <div className="mt-6 pt-4 flex justify-center">
+    <ProfileDropdown
+      user={{
+        name: user?.name || "Guest",
+        email: user?.name?.includes("@") ? user.name : "guest@example.com",
+        isAuthenticated: user?.name && !user.name.includes("Guest") && !user.name.includes("unknown")
+      }}
+    />
     <button
       onClick={() => setSidebarOpen(false)}
       className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
@@ -349,7 +355,7 @@ useEffect(() => {
                 }`}
               >
                 {scan.result.status === "scam"
-                  ? "⚠️ Scam Detected"
+                  ? "⚠��� Scam Detected"
                   : "✅ Looks Safe"}
               </p>
               <p className="text-sm mt-1">
