@@ -117,21 +117,11 @@ export default function AuthPage() {
         </div>
 
         {/* Form Panel */}
-        <motion.div
-          animate={{ x: isLogin ? "100%" : "0%" }}
-          transition={{ duration: 0.8 }}
-          className="relative md:absolute top-0 left-0 w-full md:w-1/2 md:h-full p-4 sm:p-6 md:p-10 z-10 flex items-center justify-center bg-[#0f0f0f] flex-1"
-        >
-          <AnimatePresence mode="wait">
-            <motion.form
-              key={isLogin ? "login" : "signup"}
-              onSubmit={handleSubmit}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.5 }}
-              className={`w-full max-w-sm sm:max-w-md space-y-4 sm:space-y-5 ${shake ? "animate-shake" : ""}`}
-            >
+        <div className="relative md:absolute top-0 right-0 w-full md:w-1/2 md:h-full p-4 sm:p-6 md:p-10 z-10 flex items-center justify-center bg-[#0f0f0f] flex-1">
+          <form
+            onSubmit={handleSubmit}
+            className={`w-full max-w-sm sm:max-w-md space-y-4 sm:space-y-5 ${shake ? "animate-shake" : ""}`}
+          >
               <h2 className="text-white text-2xl sm:text-3xl font-semibold">
                 {isLogin ? "Login" : "Get Started"}
               </h2>
@@ -236,9 +226,8 @@ export default function AuthPage() {
                   {isLogin ? "Create account" : "Log in"}
                 </button>
               </p>
-            </motion.form>
-          </AnimatePresence>
-        </motion.div>
+          </form>
+        </div>
       </motion.div>
     </div>
   );
