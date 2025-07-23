@@ -159,13 +159,19 @@ export default function SessionCard({
         >
           <FiMoreVertical className="w-4 h-4" />
         </button>
+      </div>
 
-        {/* Dropdown Menu */}
-        {isDropdownOpen && (
-          <div
-            ref={dropdownRef}
-            className="absolute right-0 top-full mt-2 w-48 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-xl z-50 py-1 animate-fade-in-down"
-          >
+      {/* Dropdown Menu - Portal to prevent hover conflicts */}
+      {isDropdownOpen && (
+        <div
+          ref={dropdownRef}
+          className="fixed z-50"
+          style={{
+            top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
+            left: buttonRef.current ? buttonRef.current.getBoundingClientRect().right - 192 : 0,
+          }}
+        >
+          <div className="w-48 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-xl py-1 animate-fade-in-down">
             <button
               onClick={handleEditClick}
               className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-150"
@@ -182,8 +188,8 @@ export default function SessionCard({
               Delete session
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Active Session Indicator */}
       {isActive && (
