@@ -231,7 +231,7 @@ useEffect(() => {
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed left-4 top-4 z-50 p-2 bg-[#111] rounded-md shadow-lg hover:bg-[#222] transition-all"
+          className="fixed left-4 top-4 z-[70] p-2 bg-[#111] rounded-md shadow-lg hover:bg-[#222] transition-all"
           title="Expand"
         >
           <svg
