@@ -118,7 +118,7 @@ export default function AuthPage() {
 
         {/* Form Panel */}
         <motion.div
-          animate={{ x: isLogin ? "0%" : "100%" }}
+          animate={{ x: isLogin ? "100%" : "0%" }}
           transition={{ duration: 0.8 }}
           className="relative md:absolute top-0 left-0 w-full md:w-1/2 md:h-full p-4 sm:p-6 md:p-10 z-10 flex items-center justify-center bg-[#0f0f0f] flex-1"
         >
