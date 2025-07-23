@@ -285,7 +285,7 @@ useEffect(() => {
 </div>
 
 
-          <div className="space-y-2 flex-1 overflow-auto">
+          <div className="space-y-2 flex-1 overflow-auto no-scrollbar">
             {sessions.map((s) => (
               <SessionCard
                 key={s.id}
