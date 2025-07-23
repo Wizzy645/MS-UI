@@ -104,7 +104,7 @@ export default function AuthPage() {
         </div>
 
         {/* Form Panel */}
-        <div className="relative md:absolute top-0 right-0 w-full md:w-1/2 md:h-full p-4 sm:p-6 md:p-10 z-10 flex items-center justify-center bg-[#0f0f0f] flex-1">
+        <div className="relative w-full md:w-1/2 md:h-full p-4 sm:p-6 md:p-10 z-10 flex items-center justify-center bg-[#0f0f0f] flex-1">
           <form
             onSubmit={handleSubmit}
             className={`w-full max-w-sm sm:max-w-md space-y-4 sm:space-y-5 ${shake ? "animate-shake" : ""}`}
