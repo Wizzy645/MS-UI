@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FiMoreVertical, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 interface SessionCardProps {
