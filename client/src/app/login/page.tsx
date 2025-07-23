@@ -154,12 +154,13 @@ export default function AuthPage() {
                   className="w-full pl-10 pr-10 py-3 rounded-lg bg-[#1e1e1e] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   required
                 />
-                <div
+                <button
+                  type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute top-3 right-3 text-purple-300 hover:text-purple-100 cursor-pointer"
+                  className="absolute top-3 right-3 text-purple-300 hover:text-purple-100 cursor-pointer focus:outline-none"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </div>
+                </button>
               </div>
 
               {/* Button with Spinner */}
