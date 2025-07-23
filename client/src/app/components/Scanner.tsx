@@ -53,7 +53,7 @@ export default function Scanner({ user: propUser }: { user?: { name?: string } }
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const sessionKey = useMemo(() => `scanSessions-${user?.name || "default"}`, [user?.name]);
+  const sessionKey = useMemo(() => `scanSessions-${user?.name || propUser?.name || "default"}`, [user?.name, propUser?.name]);
   const activeSession = useMemo(() => 
     sessions.find((s) => s.id === currentSessionId),
     [sessions, currentSessionId]
