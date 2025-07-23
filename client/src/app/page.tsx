@@ -32,10 +32,10 @@ export default function Home() {
       <section className="min-h-screen py-28 px-6 md:px-20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
           <div className="max-w-xl">
-            <h1 className="text-5xl font-bold leading-tight mb-6" data-aos="fade-right">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" data-aos="fade-right">
               AI-Powered Scam Detection<br />
               <span className="text-purple-400">
-                For the <span className="glitch" data-glitch="Digital">Digital</span> Age
+                For the <span className="glitch hidden md:inline" data-glitch="Digital">Digital</span><span className="md:hidden">Digital</span> Age
               </span>
             </h1>
             <p className="text-lg text-gray-300 mb-6">
