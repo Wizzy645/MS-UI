@@ -41,7 +41,8 @@ interface Session {
 
 
 // Keep your Scanner component as-is
-export default function Scanner({ user }: { user: { name?: string } }) {
+export default function Scanner({ user: propUser }: { user?: { name?: string } }) {
+  const { user } = useUser();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
