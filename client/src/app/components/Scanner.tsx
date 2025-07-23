@@ -10,6 +10,7 @@ import { MdHistory, MdAdd } from "react-icons/md";
 import ProfileDropdown from "./ProfileDropdown";
 import SessionCard from "./SessionCard";
 import EditSessionModal from "./EditSessionModal";
+import { useUser } from "../context/UserContext";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
