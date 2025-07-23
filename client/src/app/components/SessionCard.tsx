@@ -70,6 +70,13 @@ export default function SessionCard({
 
   const handleDropdownToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!isDropdownOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      });
+    }
     setIsDropdownOpen(!isDropdownOpen);
   };
 
