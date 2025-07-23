@@ -149,10 +149,10 @@ export default function SessionCard({
         <button
           ref={buttonRef}
           onClick={handleDropdownToggle}
-          className={`p-2 rounded-lg transition-all duration-200 ${
+          className={`p-2.5 rounded-xl transition-all duration-200 border ${
             isDropdownOpen
-              ? "bg-white/20 opacity-100"
-              : "hover:bg-white/10 opacity-0 group-hover:opacity-100"
+              ? "bg-gradient-to-r from-purple-600/30 to-blue-600/30 border-purple-400/50 opacity-100 scale-110"
+              : "hover:bg-gradient-to-r hover:from-purple-600/20 hover:to-blue-600/20 hover:border-purple-400/30 border-transparent opacity-0 group-hover:opacity-100 hover:scale-105"
           } ${isActive ? "text-white" : "text-gray-400"}`}
           aria-label="Session options"
           title="Session options"
