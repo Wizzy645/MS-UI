@@ -130,7 +130,7 @@ export default function AuthPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.5 }}
-              className={`w-full max-w-md space-y-5 ${shake ? "animate-shake" : ""}`}
+              className={`w-full max-w-sm sm:max-w-md space-y-4 sm:space-y-5 ${shake ? "animate-shake" : ""}`}
             >
               <h2 className="text-white text-3xl font-semibold">
                 {isLogin ? "Login" : "Get Started"}
