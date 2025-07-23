@@ -321,7 +321,7 @@ useEffect(() => {
        {!activeSession?.scans?.length && !loading && (
   <div className="text-center mb-12">
     <h1 className="text-4xl font-bold mb-2">
-      {getGreeting()}, {user?.name}
+      {getGreeting()}, {user?.name || propUser?.name || "Guest"}
     </h1>
     <h2 className="text-xl text-purple-400">
       Stay protected with AI-powered scam detection
