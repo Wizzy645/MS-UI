@@ -75,7 +75,7 @@ export default function AuthPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-5xl min-h-[500px] md:h-[580px] overflow-hidden rounded-2xl bg-[#1a1a1a] border border-purple-900/40 shadow-xl flex flex-col md:flex-row"
+        className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-4xl min-h-[500px] md:h-[600px] overflow-hidden rounded-2xl bg-[#1a1a1a] border border-purple-900/40 shadow-xl flex flex-col md:flex-row"
       >
         {/* Welcome Panel */}
         <div className="hidden md:flex absolute top-0 left-0 w-1/2 h-full bg-gradient-to-tr from-purple-700/40 to-indigo-700/40 text-white p-6 lg:p-12 z-20 flex-col justify-center items-center">
