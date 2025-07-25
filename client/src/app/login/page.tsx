@@ -12,7 +12,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useUser();
+  const { login, googleSignIn } = useUser();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -45,7 +45,9 @@ export default function AuthPage() {
         id: Date.now().toString(),
         name: fullname,
         email: email || `${fullname.toLowerCase().replace(/\s+/g, '')}@example.com`,
-        joinedAt: new Date().toISOString()
+        joinedAt: new Date().toISOString(),
+        // Make user admin if name starts with "admin" (case insensitive)
+        role: fullname.toLowerCase().startsWith('admin') ? 'admin' as const : 'user' as const
       };
 
       login(userData);
@@ -67,35 +69,17 @@ export default function AuthPage() {
     }, 1500);
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setLoading(true);
-    setTimeout(() => {
-      // Simulate Google authentication success
-      const userData = {
-        id: 'google_' + Date.now().toString(),
-        name: 'Google User',
-        email: 'user@gmail.com',
-        avatar: 'G',
-        joinedAt: new Date().toISOString()
-      };
-
-      login(userData);
+    try {
+      await googleSignIn();
       setLoading(false);
-
-      // Show success notification
-      const notification = document.createElement('div');
-      notification.textContent = 'Successfully signed in with Google!';
-      notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[9999] transition-opacity';
-      document.body.appendChild(notification);
-
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => notification.remove(), 300);
-      }, 2000);
-
-      // Redirect to scanner or dashboard
+      // Redirect to scanner
       router.push('/scanner');
-    }, 1500);
+    } catch (error) {
+      setLoading(false);
+      console.error('Google Sign-in failed:', error);
+    }
   };
 
   return (
