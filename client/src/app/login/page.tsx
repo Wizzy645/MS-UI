@@ -2,21 +2,17 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa";
+import { FaUser, FaLock, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import ParticleBackground from "@/app/components/ParticleBackground";
-import { useUser } from "../context/UserContext";
-import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useUser();
-  const router = useRouter();
 
   const [formData, setFormData] = useState({
-    fullname: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -31,8 +27,8 @@ export default function AuthPage() {
     e.preventDefault();
 
     // Basic validation
-    const { fullname, email, password } = formData;
-    if (!fullname || !password || (!isLogin && !email)) {
+    const { username, email, password } = formData;
+    if (!username || !password || (!isLogin && !email)) {
       setShake(true);
       setTimeout(() => setShake(false), 500);
       return;
@@ -40,61 +36,8 @@ export default function AuthPage() {
 
     setLoading(true);
     setTimeout(() => {
-      // Simulate authentication success
-      const userData = {
-        id: Date.now().toString(),
-        name: fullname,
-        email: email || `${fullname.toLowerCase().replace(/\s+/g, '')}@example.com`,
-        joinedAt: new Date().toISOString()
-      };
-
-      login(userData);
       setLoading(false);
-
-      // Show success notification
-      const notification = document.createElement('div');
-      notification.textContent = isLogin ? 'Welcome back!' : 'Account created successfully!';
-      notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[9999] transition-opacity';
-      document.body.appendChild(notification);
-
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => notification.remove(), 300);
-      }, 2000);
-
-      // Redirect to scanner or dashboard
-      router.push('/scanner');
-    }, 1500);
-  };
-
-  const handleGoogleSignIn = () => {
-    setLoading(true);
-    setTimeout(() => {
-      // Simulate Google authentication success
-      const userData = {
-        id: 'google_' + Date.now().toString(),
-        name: 'Google User',
-        email: 'user@gmail.com',
-        avatar: 'G',
-        joinedAt: new Date().toISOString()
-      };
-
-      login(userData);
-      setLoading(false);
-
-      // Show success notification
-      const notification = document.createElement('div');
-      notification.textContent = 'Successfully signed in with Google!';
-      notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-[9999] transition-opacity';
-      document.body.appendChild(notification);
-
-      setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => notification.remove(), 300);
-      }, 2000);
-
-      // Redirect to scanner or dashboard
-      router.push('/scanner');
+      alert(isLogin ? "Logged In!" : "Account Created!");
     }, 1500);
   };
 
@@ -106,41 +49,52 @@ export default function AuthPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-4xl min-h-[500px] md:h-[600px] overflow-hidden rounded-2xl bg-[#1a1a1a] border border-purple-900/40 shadow-xl flex flex-col md:flex-row"
+        className="relative z-10 w-full max-w-5xl h-[580px] overflow-hidden rounded-2xl bg-[#1a1a1a] border border-purple-900/40 shadow-xl flex flex-col md:flex-row"
       >
         {/* Welcome Panel */}
-        <div className="hidden md:flex w-1/2 h-full bg-gradient-to-tr from-purple-700/40 to-indigo-700/40 text-white p-6 lg:p-12 flex-col justify-center items-center">
-          <div className="text-center">
-            <h2 className="text-4xl font-bold mb-3">
-              {isLogin ? "Welcome Back" : "Join the Revolution"}
-            </h2>
-            <p className="text-gray-200 text-sm max-w-sm leading-relaxed">
-              {isLogin
-                ? "Log in to access your AI-powered threat control panel."
-                : "Sign up to enter a smarter, more secure world."}
-            </p>
-          </div>
-        </div>
-
-        {/* Mobile Welcome Section */}
-        <div className="md:hidden w-full bg-gradient-to-r from-purple-700/30 to-indigo-700/30 p-6 text-center text-white">
-          <h2 className="text-2xl font-bold mb-2">
-            {isLogin ? "Welcome Back" : "Join MamaSecure"}
-          </h2>
-          <p className="text-gray-200 text-sm">
-            {isLogin
-              ? "Log in to access your AI-powered scam detection."
-              : "Sign up to stay protected from scams."}
-          </p>
-        </div>
+        <motion.div
+          animate={{ x: isLogin ? 0 : "100%" }}
+          transition={{ duration: 0.8 }}
+          className="hidden md:flex absolute top-0 left-0 w-1/2 h-full bg-gradient-to-tr from-purple-700/40 to-indigo-700/40 text-white p-12 z-20 flex-col justify-center items-center"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isLogin ? "loginText" : "signupText"}
+              initial={{ opacity: 0, x: isLogin ? -30 : 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isLogin ? 30 : -30 }}
+              transition={{ duration: 0.5 }}
+              className="text-center"
+            >
+              <h2 className="text-4xl font-bold mb-3">
+                {isLogin ? "Welcome Back" : "Join the Revolution"}
+              </h2>
+              <p className="text-gray-200 text-sm max-w-sm leading-relaxed">
+                {isLogin
+                  ? "Log in to access your AI-powered threat control panel."
+                  : "Sign up to enter a smarter, more secure world."}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
 
         {/* Form Panel */}
-        <div className="w-full md:w-1/2 h-full p-4 sm:p-6 md:p-10 flex items-center justify-center bg-[#0f0f0f]">
-          <form
-            onSubmit={handleSubmit}
-            className={`w-full max-w-sm sm:max-w-md space-y-4 sm:space-y-5 ${shake ? "animate-shake" : ""}`}
-          >
-              <h2 className="text-white text-2xl sm:text-3xl font-semibold">
+        <motion.div
+          animate={{ x: isLogin ? "100%" : "0%" }}
+          transition={{ duration: 0.8 }}
+          className="absolute top-0 left-0 w-full md:w-1/2 h-full p-10 z-10 flex items-center justify-center bg-[#0f0f0f]"
+        >
+          <AnimatePresence mode="wait">
+            <motion.form
+              key={isLogin ? "login" : "signup"}
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.5 }}
+              className={`w-full max-w-md space-y-5 ${shake ? "animate-shake" : ""}`}
+            >
+              <h2 className="text-white text-3xl font-semibold">
                 {isLogin ? "Login" : "Get Started"}
               </h2>
 
@@ -149,9 +103,9 @@ export default function AuthPage() {
                 <FaUser className="absolute top-3 left-3 text-purple-400" />
                 <input
                   name="fullname"
-                  value={formData.fullname}
+                  value={formData.username}
                   onChange={handleChange}
-                  placeholder="Full Name"
+                  placeholder="Fullname"
                   className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1e1e1e] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   required
                 />
@@ -185,13 +139,12 @@ export default function AuthPage() {
                   className="w-full pl-10 pr-10 py-3 rounded-lg bg-[#1e1e1e] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   required
                 />
-                <button
-                  type="button"
+                <div
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute top-3 right-3 text-purple-300 hover:text-purple-100 cursor-pointer focus:outline-none"
+                  className="absolute top-3 right-3 text-purple-300 hover:text-purple-100 cursor-pointer"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+                </div>
               </div>
 
               {/* Button with Spinner */}
@@ -235,24 +188,6 @@ export default function AuthPage() {
                 )}
               </button>
 
-              {/* Divider */}
-              <div className="flex items-center justify-center space-x-4 my-4">
-                <div className="flex-1 h-px bg-gray-600"></div>
-                <span className="text-gray-400 text-sm">or</span>
-                <div className="flex-1 h-px bg-gray-600"></div>
-              </div>
-
-              {/* Google Sign-In Button */}
-              <button
-                onClick={handleGoogleSignIn}
-                disabled={loading}
-                type="button"
-                className="w-full py-3 rounded-xl bg-white text-gray-800 font-semibold transition flex items-center justify-center gap-3 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <FaGoogle className="text-red-500" />
-                {loading ? "Signing in..." : `Continue with Google`}
-              </button>
-
               <p className="text-sm text-gray-400 text-center">
                 {isLogin ? "New here?" : "Already a user?"}{" "}
                 <button
@@ -263,8 +198,9 @@ export default function AuthPage() {
                   {isLogin ? "Create account" : "Log in"}
                 </button>
               </p>
-          </form>
-        </div>
+            </motion.form>
+          </AnimatePresence>
+        </motion.div>
       </motion.div>
     </div>
   );
