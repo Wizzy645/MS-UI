@@ -3,29 +3,33 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MdLogout, MdPerson, MdSettings, MdDashboard } from "react-icons/md";
 import { useRouter } from "next/navigation";
-
-interface User {
-  name?: string;
-  email?: string;
-  avatar?: string;
-  isAuthenticated?: boolean;
-}
+import { useUser } from "../context/UserContext";
 
 interface ProfileDropdownProps {
   userEmail?: string;
-  user?: User;
+  user?: {
+    name?: string;
+    email?: string;
+    avatar?: string;
+    isAuthenticated?: boolean;
+    role?: 'admin' | 'user';
+  };
 }
 
 const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { user: contextUser, isAdmin } = useUser();
+
+  // Use context user if available, fallback to prop user
+  const currentUser = contextUser || user;
 
   // Determine user info
-  const isGuest = !user?.isAuthenticated && (!userEmail || userEmail.includes("unknown") || userEmail.includes("guest"));
-  const displayName = user?.name || (userEmail && !userEmail.includes("unknown") ? userEmail.split("@")[0] : "Guest");
-  const displayEmail = user?.email || userEmail || "guest@example.com";
-  const initials = user?.avatar || displayName.charAt(0).toUpperCase();
+  const isGuest = !currentUser?.isAuthenticated && (!userEmail || userEmail.includes("unknown") || userEmail.includes("guest"));
+  const displayName = currentUser?.name || (userEmail && !userEmail.includes("unknown") ? userEmail.split("@")[0] : "Guest");
+  const displayEmail = currentUser?.email || userEmail || "guest@example.com";
+  const initials = currentUser?.avatar || displayName.charAt(0).toUpperCase();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,12 +66,22 @@ const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
 
   const handleProfile = () => {
     setIsOpen(false);
-    router.push('/dashboard/profile');
+    // Redirect to user-specific profile page for regular users, admin profile for admins
+    if (isAdmin) {
+      router.push('/dashboard/profile');
+    } else {
+      router.push('/profile');
+    }
   };
 
   const handleSettings = () => {
     setIsOpen(false);
-    router.push('/dashboard/settings');
+    // Redirect to user-specific settings page for regular users, admin settings for admins
+    if (isAdmin) {
+      router.push('/dashboard/settings');
+    } else {
+      router.push('/settings');
+    }
   };
 
   const copyEmailToClipboard = () => {
@@ -109,7 +123,14 @@ const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
                 {initials}
               </div>
               <div>
-                <div className="text-sm font-semibold text-white">{displayName}</div>
+                <div className="text-sm font-semibold text-white flex items-center gap-2">
+                  {displayName}
+                  {isAdmin && (
+                    <span className="text-xs bg-purple-600 px-2 py-0.5 rounded-full">
+                      Admin
+                    </span>
+                  )}
+                </div>
                 <div
                   onClick={copyEmailToClipboard}
                   className="text-xs text-gray-400 hover:text-purple-400 cursor-pointer transition-colors"
@@ -132,12 +153,15 @@ const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
               </button>
             ) : (
               <>
-                <button
-                  onClick={handleDashboard}
-                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
-                >
-                  <MdDashboard className="mr-3" /> Dashboard
-                </button>
+                {/* Only show Dashboard link for admin users */}
+                {isAdmin && (
+                  <button
+                    onClick={handleDashboard}
+                    className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
+                  >
+                    <MdDashboard className="mr-3" /> Admin Dashboard
+                  </button>
+                )}
                 <button
                   onClick={handleProfile}
                   className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
