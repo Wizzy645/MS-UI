@@ -12,7 +12,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useUser();
+  const { login, googleSignIn } = useUser();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -70,7 +70,6 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const { googleSignIn } = useUser();
       await googleSignIn();
       setLoading(false);
       // Redirect to scanner
