@@ -87,17 +87,43 @@ export default function ScanPage() {
         <button
           onClick={handleScan}
           disabled={!input.trim() || loading}
-          className="absolute bottom-2 right-2 bg-purple-700 hover:bg-purple-600 transition text-white font-bold px-6 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
+          className="absolute bottom-2 right-2 bg-purple-700 hover:bg-purple-600 transition-all duration-200 text-white font-bold px-6 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 flex items-center space-x-2"
         >
-          {loading ? "Scanning..." : "Scan"}
+          {loading && (
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          )}
+          <span>{loading ? "Scanning..." : "Scan"}</span>
         </button>
       </div>
 
       {/* Loader */}
       {loading && (
-        <div className="flex justify-center mb-6">
-          <Lottie animationData={typingAnimation} className="w-24" />
-        </div>
+        <motion.div
+          className="flex justify-center mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl px-6 py-4 shadow-lg">
+            <div className="relative">
+              <div className="w-6 h-6 border-2 border-purple-400/30 rounded-full"></div>
+              <div className="absolute inset-0 w-6 h-6 border-2 border-transparent border-t-purple-400 rounded-full animate-spin"></div>
+            </div>
+            <div className="flex flex-col">
+              <div className="text-sm font-medium text-white mb-1">
+                AI Analyzing Content...
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                <div className="text-xs text-purple-300 ml-2">
+                  Checking threat databases
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       )}
 
       {/* Result */}

@@ -287,7 +287,7 @@ useEffect(() => {
   </h2>
   
   <div className="mt-6 pt-4 flex justify-center">
-    <ProfileDropdown user={user} />
+    <ProfileDropdown user={user || undefined} />
     <button
       onClick={() => setSidebarOpen(false)}
       className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
@@ -407,9 +407,32 @@ useEffect(() => {
             </motion.div>
           ))}
           {loading && (
-            <div className="mt-6 flex justify-start">
-              <Lottie animationData={typingDots} className="w-24" />
-            </div>
+            <motion.div
+              className="mt-6 flex flex-col items-start"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl px-6 py-4 shadow-lg">
+                <div className="relative">
+                  <div className="w-6 h-6 border-2 border-purple-400/30 rounded-full"></div>
+                  <div className="absolute inset-0 w-6 h-6 border-2 border-transparent border-t-purple-400 rounded-full animate-spin"></div>
+                </div>
+                <div className="flex flex-col">
+                  <div className="text-sm font-medium text-white mb-1">
+                    AI Analyzing Content...
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    <div className="text-xs text-purple-300 ml-2">
+                      Checking threat databases
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -442,24 +465,34 @@ useEffect(() => {
             />
             <button
               onClick={handleScan}
-              disabled={!input.trim() || !user?.isAuthenticated}
-              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition disabled:opacity-50 ${
-                user?.isAuthenticated
-                  ? 'bg-white text-black hover:bg-gray-200'
+              disabled={!input.trim() || !user?.isAuthenticated || loading}
+              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-all duration-200 disabled:opacity-50 ${
+                user?.isAuthenticated && !loading
+                  ? 'bg-white text-black hover:bg-gray-200 hover:scale-105'
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed'
               }`}
-              title={!user?.isAuthenticated ? 'Please sign in to scan' : 'Scan content'}
+              title={
+                !user?.isAuthenticated
+                  ? 'Please sign in to scan'
+                  : loading
+                    ? 'Scanning...'
+                    : 'Scan content'
+              }
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-              </svg>
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-gray-400/30 border-t-gray-600 rounded-full animate-spin"></div>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
