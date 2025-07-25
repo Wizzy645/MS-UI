@@ -465,24 +465,34 @@ useEffect(() => {
             />
             <button
               onClick={handleScan}
-              disabled={!input.trim() || !user?.isAuthenticated}
-              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition disabled:opacity-50 ${
-                user?.isAuthenticated
-                  ? 'bg-white text-black hover:bg-gray-200'
+              disabled={!input.trim() || !user?.isAuthenticated || loading}
+              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-all duration-200 disabled:opacity-50 ${
+                user?.isAuthenticated && !loading
+                  ? 'bg-white text-black hover:bg-gray-200 hover:scale-105'
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed'
               }`}
-              title={!user?.isAuthenticated ? 'Please sign in to scan' : 'Scan content'}
+              title={
+                !user?.isAuthenticated
+                  ? 'Please sign in to scan'
+                  : loading
+                    ? 'Scanning...'
+                    : 'Scan content'
+              }
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-              </svg>
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-gray-400/30 border-t-gray-600 rounded-full animate-spin"></div>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
