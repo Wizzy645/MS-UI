@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FiMoreVertical, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 interface SessionCardProps {
@@ -25,8 +26,13 @@ export default function SessionCard({
   onDelete,
 }: SessionCardProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -149,40 +155,111 @@ export default function SessionCard({
         <button
           ref={buttonRef}
           onClick={handleDropdownToggle}
-          className={`p-1.5 rounded-md transition-colors duration-200 ${
+          className={`p-2.5 rounded-xl transition-all duration-200 border ${
             isDropdownOpen
-              ? "bg-white/20"
-              : "hover:bg-white/10 opacity-0 group-hover:opacity-100"
+              ? "bg-gradient-to-r from-purple-600/30 to-blue-600/30 border-purple-400/50 opacity-100 scale-110"
+              : "hover:bg-gradient-to-r hover:from-purple-600/20 hover:to-blue-600/20 hover:border-purple-400/30 border-transparent opacity-0 group-hover:opacity-100 hover:scale-105"
           } ${isActive ? "text-white" : "text-gray-400"}`}
           aria-label="Session options"
+          title="Session options"
         >
           <FiMoreVertical className="w-4 h-4" />
         </button>
+      </div>
 
-        {/* Dropdown Menu */}
-        {isDropdownOpen && (
+      {/* Portal-Based Dropdown - Renders Outside Sidebar */}
+      {isDropdownOpen && isMounted && typeof window !== 'undefined' &&
+        createPortal(
           <div
             ref={dropdownRef}
-            className="absolute right-0 top-full mt-1 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl z-50 py-1"
+            className="fixed z-[200] pointer-events-none"
+            style={{
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+            }}
           >
-            <button
-              onClick={handleEditClick}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors duration-150"
+            <div
+              className="absolute pointer-events-auto"
+              style={{
+                top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 8 : 0,
+                left: buttonRef.current ? Math.max(8, buttonRef.current.getBoundingClientRect().right - 280) : 0,
+              }}
             >
-              <FiEdit2 className="w-4 h-4" />
-              Edit session name
-            </button>
-            
-            <button
-              onClick={handleDeleteClick}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150"
-            >
-              <FiTrash2 className="w-4 h-4" />
-              Delete session
-            </button>
-          </div>
-        )}
-      </div>
+              <div className="w-70 bg-[#1e1e1e] border border-gray-600 rounded-xl shadow-2xl overflow-hidden animate-fade-in-down">
+                {/* Session Info Header */}
+                <div className="px-4 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-gray-600">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white border-purple-400'
+                        : 'bg-gray-700 text-gray-300 border-gray-500'
+                    }`}>
+                      {scanCount || 0}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-white truncate" title={label}>
+                        {label}
+                      </div>
+                      <div className="text-xs text-gray-400 flex items-center gap-2">
+                        <span>{scanCount} scan{scanCount !== 1 ? 's' : ''}</span>
+                        {lastUpdated && (
+                          <>
+                            <span>•</span>
+                            <span>{formatLastUpdated(lastUpdated)}</span>
+                          </>
+                        )}
+                        {isActive && (
+                          <>
+                            <span>•</span>
+                            <span className="text-green-400 flex items-center gap-1">
+                              <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                              Active
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Menu Options */}
+                <div className="py-2">
+                  <button
+                    onClick={handleEditClick}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-gradient-to-r hover:from-blue-600/20 hover:to-purple-600/20 hover:text-white transition-all duration-200 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center group-hover:bg-blue-600/40 transition-colors">
+                      <FiEdit2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-medium">Edit Session</div>
+                      <div className="text-xs text-gray-500">Rename this session</div>
+                    </div>
+                  </button>
+
+                  <div className="border-t border-gray-700 mt-2 pt-2">
+                    <button
+                      onClick={handleDeleteClick}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-gradient-to-r hover:from-red-600/20 hover:to-red-700/20 hover:text-red-300 transition-all duration-200 group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center group-hover:bg-red-600/40 transition-colors">
+                        <FiTrash2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-medium">Delete Session</div>
+                        <div className="text-xs text-gray-500">Permanently remove this session</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      }
 
       {/* Active Session Indicator */}
       {isActive && (

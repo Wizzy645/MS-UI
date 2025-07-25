@@ -1,11 +1,31 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdPerson, MdSettings, MdDashboard } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
-const ProfileDropdown = ({ userEmail }: { userEmail: string }) => {
+interface User {
+  name?: string;
+  email?: string;
+  avatar?: string;
+  isAuthenticated?: boolean;
+}
+
+interface ProfileDropdownProps {
+  userEmail?: string;
+  user?: User;
+}
+
+const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Determine user info
+  const isGuest = !user?.isAuthenticated && (!userEmail || userEmail.includes("unknown") || userEmail.includes("guest"));
+  const displayName = user?.name || (userEmail && !userEmail.includes("unknown") ? userEmail.split("@")[0] : "Guest");
+  const displayEmail = user?.email || userEmail || "guest@example.com";
+  const initials = user?.avatar || displayName.charAt(0).toUpperCase();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -21,13 +41,46 @@ const ProfileDropdown = ({ userEmail }: { userEmail: string }) => {
   }, []);
 
   const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
     console.log("User logged out");
     setIsOpen(false);
+    // Redirect to login or home
+    router.push('/login');
+  };
+
+  const handleLogin = () => {
+    setIsOpen(false);
+    router.push('/login');
+  };
+
+  const handleDashboard = () => {
+    setIsOpen(false);
+    router.push('/dashboard');
+  };
+
+  const handleProfile = () => {
+    setIsOpen(false);
+    router.push('/dashboard/profile');
+  };
+
+  const handleSettings = () => {
+    setIsOpen(false);
+    router.push('/dashboard/settings');
   };
 
   const copyEmailToClipboard = () => {
-    navigator.clipboard.writeText(userEmail);
-    alert(`User ID (${userEmail}) has been copied to clipboard!`);
+    navigator.clipboard.writeText(displayEmail);
+    // Use a better notification instead of alert
+    const notification = document.createElement('div');
+    notification.textContent = `Email copied to clipboard!`;
+    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-[9999] transition-opacity';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
     setIsOpen(false);
   };
 
@@ -35,25 +88,79 @@ const ProfileDropdown = ({ userEmail }: { userEmail: string }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+        className={`flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 ${
+          isGuest
+            ? 'bg-gray-600 hover:bg-gray-700 border-2 border-gray-500'
+            : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 border-2 border-purple-400/30'
+        }`}
+        title={isGuest ? 'Guest User - Click to Login' : `${displayName} - Click for options`}
       >
-        {userEmail.charAt(0).toUpperCase()}
+        {initials}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
-          <div 
-            onClick={copyEmailToClipboard}
-            className="px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 cursor-pointer border-b border-gray-700"
-          >
-            {userEmail}
+        <div className="absolute right-0 mt-2 w-64 bg-[#1e1e1e] border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 animate-fade-in-down">
+          {/* User Info Header */}
+          <div className="px-4 py-3 bg-gradient-to-r from-purple-600/20 to-purple-700/20 border-b border-gray-700">
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                isGuest ? 'bg-gray-600' : 'bg-gradient-to-r from-purple-600 to-purple-700'
+              }`}>
+                {initials}
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-white">{displayName}</div>
+                <div
+                  onClick={copyEmailToClipboard}
+                  className="text-xs text-gray-400 hover:text-purple-400 cursor-pointer transition-colors"
+                  title="Click to copy email"
+                >
+                  {displayEmail}
+                </div>
+              </div>
+            </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center"
-          >
-            <MdLogout className="mr-2" /> Log out
-          </button>
+
+          {/* Menu Options */}
+          <div className="py-2">
+            {isGuest ? (
+              <button
+                onClick={handleLogin}
+                className="w-full text-left px-4 py-3 text-sm text-purple-400 hover:bg-purple-600/20 flex items-center transition-colors"
+              >
+                <MdPerson className="mr-3" /> Sign In
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleDashboard}
+                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
+                >
+                  <MdDashboard className="mr-3" /> Dashboard
+                </button>
+                <button
+                  onClick={handleProfile}
+                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
+                >
+                  <MdPerson className="mr-3" /> Profile
+                </button>
+                <button
+                  onClick={handleSettings}
+                  className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700/50 flex items-center transition-colors"
+                >
+                  <MdSettings className="mr-3" /> Settings
+                </button>
+                <div className="border-t border-gray-700 mt-2 pt-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-600/20 flex items-center transition-colors"
+                  >
+                    <MdLogout className="mr-3" /> Sign Out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>

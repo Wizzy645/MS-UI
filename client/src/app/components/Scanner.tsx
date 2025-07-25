@@ -10,6 +10,7 @@ import { MdHistory, MdAdd } from "react-icons/md";
 import ProfileDropdown from "./ProfileDropdown";
 import SessionCard from "./SessionCard";
 import EditSessionModal from "./EditSessionModal";
+import { useUser } from "../context/UserContext";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -40,7 +41,8 @@ interface Session {
 
 
 // Keep your Scanner component as-is
-export default function Scanner({ user }: { user: { name?: string } }) {
+export default function Scanner({ user: propUser }: { user?: { name?: string } }) {
+  const { user } = useUser();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -51,7 +53,7 @@ export default function Scanner({ user }: { user: { name?: string } }) {
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const sessionKey = useMemo(() => `scanSessions-${user?.name || "default"}`, [user?.name]);
+  const sessionKey = useMemo(() => `scanSessions-${user?.name || propUser?.name || "default"}`, [user?.name, propUser?.name]);
   const activeSession = useMemo(() => 
     sessions.find((s) => s.id === currentSessionId),
     [sessions, currentSessionId]
@@ -180,6 +182,31 @@ useEffect(() => {
 
   const handleScan = () => {
     if (!input.trim() || !currentSessionId) return;
+
+    // Check if user is authenticated
+    if (!user?.isAuthenticated) {
+      // Show authentication required notification
+      const notification = document.createElement('div');
+      notification.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <div class="text-yellow-400">⚠️</div>
+          <div>
+            <div class="font-semibold">Authentication Required</div>
+            <div class="text-sm text-gray-300">Please sign in to use the scanner</div>
+          </div>
+        </div>
+      `;
+      notification.className = 'fixed top-4 right-4 bg-yellow-600/90 text-white px-6 py-4 rounded-xl shadow-lg z-[9999] transition-opacity max-w-sm';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 4000);
+
+      return;
+    }
+
     setLoading(true);
 
     const fakeResult: ScanResult = {
@@ -231,27 +258,25 @@ useEffect(() => {
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed left-4 top-4 z-50 p-2 bg-[#111] rounded-md shadow-lg hover:bg-[#222] transition-all"
-          title="Expand"
+          className="fixed left-4 top-4 z-[70] p-3 bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl shadow-xl hover:from-purple-500 hover:to-purple-600 transition-all duration-300 border border-purple-400/30"
+          title="Open Menu"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 text-white"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
           >
-            <path
-              fillRule="evenodd"
-              d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
-              clipRule="evenodd"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 p-4 overflow-y-auto transition-all duration-300 ease-in-out z-30 ${
+        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 p-4 overflow-y-auto no-scrollbar transition-all duration-300 ease-in-out z-[60] ${
           sidebarOpen ? "w-72" : "w-0"
         }`}
       >
@@ -261,31 +286,29 @@ useEffect(() => {
     <MdHistory className="text-purple-400" /> Sessions
   </h2>
   
-  <div className="mt-6  pt-4 flex justify-center">
-    <ProfileDropdown userEmail={user?.name || "unknown@domain.com"} />
+  <div className="mt-6 pt-4 flex justify-center">
+    <ProfileDropdown user={user} />
     <button
       onClick={() => setSidebarOpen(false)}
-      className="p-1 rounded hover:bg-white/10 transition"
-      title="Collapse"
+      className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
+      title="Close Menu"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 text-white"
-        viewBox="0 0 20 20"
-        fill="currentColor"
+        className="h-5 w-5 text-white hover:text-red-400 transition-colors"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
       >
-        <path
-          fillRule="evenodd"
-          d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414z"
-          clipRule="evenodd"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   </div>
 </div>
 
 
-          <div className="space-y-2 flex-1 overflow-auto">
+          <div className="space-y-2 flex-1 overflow-auto no-scrollbar">
             {sessions.map((s) => (
               <SessionCard
                 key={s.id}
@@ -317,11 +340,28 @@ useEffect(() => {
        {!activeSession?.scans?.length && !loading && (
   <div className="text-center mb-12">
     <h1 className="text-4xl font-bold mb-2">
-      {getGreeting()}, {user?.name}
+      {getGreeting()}, {user?.name || propUser?.name || "Guest"}
     </h1>
     <h2 className="text-xl text-purple-400">
       Stay protected with AI-powered scam detection
     </h2>
+    {!user?.isAuthenticated && (
+      <div className="mt-8 p-6 bg-yellow-600/20 border border-yellow-500/30 rounded-xl max-w-md mx-auto">
+        <div className="flex items-center justify-center mb-3">
+          <div className="text-yellow-400 text-2xl">🔐</div>
+        </div>
+        <h3 className="text-lg font-semibold text-yellow-400 mb-2">Authentication Required</h3>
+        <p className="text-gray-300 text-sm mb-4">
+          Sign in to access the AI-powered scam scanner and protect yourself from threats.
+        </p>
+        <a
+          href="/login"
+          className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+        >
+          Sign In / Register
+        </a>
+      </div>
+    )}
   </div>
 )}
 
@@ -353,7 +393,7 @@ useEffect(() => {
                 }`}
               >
                 {scan.result.status === "scam"
-                  ? "⚠️ Scam Detected"
+                  ? "⚠��� Scam Detected"
                   : "✅ Looks Safe"}
               </p>
               <p className="text-sm mt-1">
@@ -382,21 +422,33 @@ useEffect(() => {
           <div className="relative w-full">
             <textarea
               ref={inputRef}
-              className="w-full p-4 rounded-xl bg-transparent text-white border border-gray-600 placeholder-gray-400 shadow-md resize-none h-24 pr-24"
-              placeholder="Paste a suspicious link or message..."
+              className={`w-full p-4 rounded-xl bg-transparent text-white border border-gray-600 placeholder-gray-400 shadow-md resize-none h-24 pr-24 ${
+                !user?.isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              placeholder={
+                user?.isAuthenticated
+                  ? "Paste a suspicious link or message..."
+                  : "Please sign in to use the scanner..."
+              }
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => user?.isAuthenticated && setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey && user?.isAuthenticated) {
                   e.preventDefault();
                   handleScan();
                 }
               }}
+              disabled={!user?.isAuthenticated}
             />
             <button
               onClick={handleScan}
-              disabled={!input.trim()}
-              className="absolute top-1/2 right-3 transform -translate-y-1/2 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-200 transition disabled:opacity-50"
+              disabled={!input.trim() || !user?.isAuthenticated}
+              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition disabled:opacity-50 ${
+                user?.isAuthenticated
+                  ? 'bg-white text-black hover:bg-gray-200'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+              title={!user?.isAuthenticated ? 'Please sign in to scan' : 'Scan content'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
