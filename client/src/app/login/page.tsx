@@ -45,7 +45,9 @@ export default function AuthPage() {
         id: Date.now().toString(),
         name: fullname,
         email: email || `${fullname.toLowerCase().replace(/\s+/g, '')}@example.com`,
-        joinedAt: new Date().toISOString()
+        joinedAt: new Date().toISOString(),
+        // Make user admin if name starts with "admin" (case insensitive)
+        role: fullname.toLowerCase().startsWith('admin') ? 'admin' as const : 'user' as const
       };
 
       login(userData);
