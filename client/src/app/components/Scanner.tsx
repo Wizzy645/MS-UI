@@ -276,36 +276,36 @@ useEffect(() => {
 
       {/* Sidebar */}
       <div
-        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 p-4 overflow-y-auto no-scrollbar transition-all duration-300 ease-in-out z-[60] ${
-          sidebarOpen ? "w-72" : "w-0"
+        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 overflow-hidden transition-all duration-300 ease-in-out z-[60] ${
+          sidebarOpen ? "w-72 p-4" : "w-0 p-0"
         }`}
       >
-        <div className={`${sidebarOpen ? "block" : "hidden"} h-full flex flex-col`}>
+        <div className={`${sidebarOpen ? "block" : "hidden"} h-full flex flex-col overflow-y-auto no-scrollbar`}>
           <div className="flex justify-between items-center mb-6">
-  <h2 className="text-xl font-semibold flex items-center gap-2">
-    <MdHistory className="text-purple-400" /> Sessions
-  </h2>
-  
-  <div className="mt-6 pt-4 flex justify-center">
-    <ProfileDropdown user={user || undefined} />
-    <button
-      onClick={() => setSidebarOpen(false)}
-      className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
-      title="Close Menu"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 text-white hover:text-red-400 transition-colors"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-</div>
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <MdHistory className="text-purple-400" /> Sessions
+            </h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
+              title="Close Menu"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white hover:text-red-400 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="mb-6 flex justify-center">
+            <ProfileDropdown user={user || undefined} />
+          </div>
 
 
           <div className="space-y-2 flex-1 overflow-auto no-scrollbar">
