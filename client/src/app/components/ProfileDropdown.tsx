@@ -102,7 +102,7 @@ const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 lg:ml-0 ml-[200px] ${
+        className={`flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 ml-[200px] ${
           isGuest
             ? 'bg-gray-600 hover:bg-gray-700 border-2 border-gray-500'
             : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 border-2 border-purple-400/30'
