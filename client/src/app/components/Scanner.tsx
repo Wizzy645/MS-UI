@@ -47,11 +47,12 @@ export default function Scanner({ user: propUser }: { user?: { name?: string } }
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [editingSession, setEditingSession] = useState<{ id: string; name: string } | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sessionKey = useMemo(() => `scanSessions-${user?.name || propUser?.name || "default"}`, [user?.name, propUser?.name]);
   const activeSession = useMemo(() => 
@@ -86,8 +87,9 @@ export default function Scanner({ user: propUser }: { user?: { name?: string } }
     const savedSidebarState = localStorage.getItem('sidebarOpen');
     if (savedSidebarState !== null) {
       setSidebarOpen(JSON.parse(savedSidebarState));
-    } else if (window.innerWidth < 768) {
-      setSidebarOpen(false);
+    } else {
+      // Default to closed on mobile, open on desktop
+      setSidebarOpen(window.innerWidth >= 768);
     }
   }, [sessionKey, hasMounted]);
 
@@ -110,21 +112,35 @@ useEffect(() => {
 }, [activeSession?.scans]);
 
 
-  // Responsive sidebar behavior
+  // Responsive sidebar behavior and click outside to close
   useEffect(() => {
     if (!hasMounted) return;
-    
+
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      // Close sidebar on mobile when resizing down
+      if (window.innerWidth < 768 && sidebarOpen) {
         setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
       }
     };
-    
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        window.innerWidth < 768 &&
+        sidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setSidebarOpen(false);
+      }
+    };
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [hasMounted]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [hasMounted, sidebarOpen]);
 
   const startNewSession = () => {
     const id = crypto.randomUUID();
@@ -274,38 +290,47 @@ useEffect(() => {
         </button>
       )}
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-[59] md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <div
-        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 p-4 overflow-y-auto no-scrollbar transition-all duration-300 ease-in-out z-[60] ${
-          sidebarOpen ? "w-72" : "w-0"
+        ref={sidebarRef}
+        className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 overflow-hidden transition-all duration-300 ease-in-out z-[60] ${
+          sidebarOpen ? "w-72 p-4" : "w-0 p-0"
         }`}
       >
-        <div className={`${sidebarOpen ? "block" : "hidden"} h-full flex flex-col`}>
+        <div className={`${sidebarOpen ? "block" : "hidden"} h-full flex flex-col overflow-y-auto no-scrollbar`}>
           <div className="flex justify-between items-center mb-6">
-  <h2 className="text-xl font-semibold flex items-center gap-2">
-    <MdHistory className="text-purple-400" /> Sessions
-  </h2>
-  
-  <div className="mt-6 pt-4 flex justify-center">
-    <ProfileDropdown user={user || undefined} />
-    <button
-      onClick={() => setSidebarOpen(false)}
-      className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
-      title="Close Menu"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 text-white hover:text-red-400 transition-colors"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-</div>
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <MdHistory className="text-purple-400" /> Sessions
+            </h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 rounded-lg hover:bg-red-500/20 hover:border-red-400 border border-transparent transition-all duration-200"
+              title="Close Menu"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white hover:text-red-400 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="mb-6 flex justify-center">
+            <ProfileDropdown user={user || undefined} />
+          </div>
 
 
           <div className="space-y-2 flex-1 overflow-auto no-scrollbar">
@@ -334,29 +359,27 @@ useEffect(() => {
       </div>
 
       {/* Main Panel */}
-      <div className={`flex-1 px-6 py-20 max-w-4xl mx-auto w-full pb-40 transition-all duration-300 ${
-        sidebarOpen ? "md:left-72" : "left-0"
-      }`}>
+      <div className={`flex-1 px-4 md:px-6 py-20 max-w-4xl mx-auto w-full pb-40 transition-all duration-300`}>
        {!activeSession?.scans?.length && !loading && (
-  <div className="text-center mb-12">
-    <h1 className="text-4xl font-bold mb-2">
+  <div className="text-center mb-8 md:mb-12 px-2">
+    <h1 className="text-2xl md:text-4xl font-bold mb-2">
       {getGreeting()}, {user?.name || propUser?.name || "Guest"}
     </h1>
-    <h2 className="text-xl text-purple-400">
+    <h2 className="text-lg md:text-xl text-purple-400">
       Stay protected with AI-powered scam detection
     </h2>
     {!user?.isAuthenticated && (
-      <div className="mt-8 p-6 bg-yellow-600/20 border border-yellow-500/30 rounded-xl max-w-md mx-auto">
+      <div className="mt-6 md:mt-8 p-4 md:p-6 bg-yellow-600/20 border border-yellow-500/30 rounded-xl max-w-md mx-auto">
         <div className="flex items-center justify-center mb-3">
-          <div className="text-yellow-400 text-2xl">🔐</div>
+          <div className="text-yellow-400 text-xl md:text-2xl">🔐</div>
         </div>
-        <h3 className="text-lg font-semibold text-yellow-400 mb-2">Authentication Required</h3>
-        <p className="text-gray-300 text-sm mb-4">
+        <h3 className="text-base md:text-lg font-semibold text-yellow-400 mb-2">Authentication Required</h3>
+        <p className="text-gray-300 text-xs md:text-sm mb-4">
           Sign in to access the AI-powered scam scanner and protect yourself from threats.
         </p>
         <a
           href="/login"
-          className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+          className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 md:px-6 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base"
         >
           Sign In / Register
         </a>
@@ -366,14 +389,14 @@ useEffect(() => {
 )}
 
         {!activeSession?.scans?.length && !loading && (
-          <div className="flex justify-center mb-10">
-            <Lottie animationData={orbAnimation} className="w-40" />
+          <div className="flex justify-center mb-6 md:mb-10">
+            <Lottie animationData={orbAnimation} className="w-32 md:w-40" />
           </div>
         )}
 
-       <div 
+       <div
   ref={resultsContainerRef}
-  className="space-y-6 overflow-y-auto max-h-[calc(100vh-300px)] no-scrollbar"
+  className="space-y-4 md:space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-300px)] no-scrollbar"
 >
 
           {activeSession?.scans?.map((scan, i) => (
@@ -438,14 +461,14 @@ useEffect(() => {
       </div>
 
       {/* Input Box */}
-      <div className={`fixed bottom-0 right-0 px-6 py-4 z-50 backdrop-blur transition-all duration-300 ${
-        sidebarOpen ? "md:left-72" : "left-0"
+      <div className={`fixed bottom-0 left-0 right-0 px-4 md:px-6 py-4 z-50 backdrop-blur-md bg-black/20 transition-all duration-300 ${
+        sidebarOpen ? "md:ml-72" : "md:ml-0"
       }`}>
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto w-full">
           <div className="relative w-full">
             <textarea
               ref={inputRef}
-              className={`w-full p-4 rounded-xl bg-transparent text-white border border-gray-600 placeholder-gray-400 shadow-md resize-none h-24 pr-24 ${
+              className={`w-full p-3 md:p-4 rounded-xl bg-transparent text-white border border-gray-600 placeholder-gray-400 shadow-md resize-none h-20 md:h-24 pr-16 md:pr-24 text-sm md:text-base ${
                 !user?.isAuthenticated ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               placeholder={
@@ -466,7 +489,7 @@ useEffect(() => {
             <button
               onClick={handleScan}
               disabled={!input.trim() || !user?.isAuthenticated || loading}
-              className={`absolute top-1/2 right-3 transform -translate-y-1/2 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-all duration-200 disabled:opacity-50 ${
+              className={`absolute top-1/2 right-2 md:right-3 transform -translate-y-1/2 rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center shadow-md transition-all duration-200 disabled:opacity-50 ${
                 user?.isAuthenticated && !loading
                   ? 'bg-white text-black hover:bg-gray-200 hover:scale-105'
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed'
@@ -480,11 +503,11 @@ useEffect(() => {
               }
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-gray-400/30 border-t-gray-600 rounded-full animate-spin"></div>
+                <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-gray-400/30 border-t-gray-600 rounded-full animate-spin"></div>
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-4 h-4"
+                  className="w-3 h-3 md:w-4 md:h-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
