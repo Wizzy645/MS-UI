@@ -47,7 +47,7 @@ export default function Scanner({ user: propUser }: { user?: { name?: string } }
   const [loading, setLoading] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [editingSession, setEditingSession] = useState<{ id: string; name: string } | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
@@ -86,8 +86,9 @@ export default function Scanner({ user: propUser }: { user?: { name?: string } }
     const savedSidebarState = localStorage.getItem('sidebarOpen');
     if (savedSidebarState !== null) {
       setSidebarOpen(JSON.parse(savedSidebarState));
-    } else if (window.innerWidth < 768) {
-      setSidebarOpen(false);
+    } else {
+      // Default to closed on mobile, open on desktop
+      setSidebarOpen(window.innerWidth >= 768);
     }
   }, [sessionKey, hasMounted]);
 
@@ -115,10 +116,9 @@ useEffect(() => {
     if (!hasMounted) return;
     
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      // Close sidebar on mobile when resizing down
+      if (window.innerWidth < 768 && sidebarOpen) {
         setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
       }
     };
     
