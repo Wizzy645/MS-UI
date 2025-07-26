@@ -334,9 +334,7 @@ useEffect(() => {
       </div>
 
       {/* Main Panel */}
-      <div className={`flex-1 px-6 py-20 max-w-4xl mx-auto w-full pb-40 transition-all duration-300 ${
-        sidebarOpen ? "md:left-72" : "left-0"
-      }`}>
+      <div className={`flex-1 px-4 md:px-6 py-20 max-w-4xl mx-auto w-full pb-40 transition-all duration-300`}>
        {!activeSession?.scans?.length && !loading && (
   <div className="text-center mb-12">
     <h1 className="text-4xl font-bold mb-2">
@@ -438,10 +436,10 @@ useEffect(() => {
       </div>
 
       {/* Input Box */}
-      <div className={`fixed bottom-0 right-0 px-6 py-4 z-50 backdrop-blur transition-all duration-300 ${
-        sidebarOpen ? "md:left-72" : "left-0"
+      <div className={`fixed bottom-0 left-0 right-0 px-4 md:px-6 py-4 z-50 backdrop-blur-md bg-black/20 transition-all duration-300 ${
+        sidebarOpen ? "md:ml-72" : "md:ml-0"
       }`}>
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto w-full">
           <div className="relative w-full">
             <textarea
               ref={inputRef}
