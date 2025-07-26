@@ -102,7 +102,7 @@ const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 lg:ml-0 ml-[200px] ${
+        className={`flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 ml-[200px] ${
           isGuest
             ? 'bg-gray-600 hover:bg-gray-700 border-2 border-gray-500'
             : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 border-2 border-purple-400/30'
@@ -116,7 +116,7 @@ const ProfileDropdown = ({ userEmail, user }: ProfileDropdownProps) => {
           <div className="relative" ref={dropdownRef}>
 
             {isOpen && (
-              <div className="absolute right-0 mt-2 lg:top-2 top-7 w-64 bg-[#1e1e1e] border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 animate-fade-in-down">
+              <div className="absolute right-0 mt-2 top-[35px] w-64 bg-[#1e1e1e] border border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 animate-fade-in-down">
                 {/* User Info Header */}
                 <div className="px-4 py-3 bg-gradient-to-r from-purple-600/20 to-purple-700/20 border-b border-gray-700">
                   <div className="flex items-center space-x-3">
