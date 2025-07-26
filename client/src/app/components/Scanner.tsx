@@ -52,6 +52,7 @@ export default function Scanner({ user: propUser }: { user?: { name?: string } }
   const [editingSession, setEditingSession] = useState<{ id: string; name: string } | null>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sessionKey = useMemo(() => `scanSessions-${user?.name || propUser?.name || "default"}`, [user?.name, propUser?.name]);
   const activeSession = useMemo(() => 
@@ -111,20 +112,35 @@ useEffect(() => {
 }, [activeSession?.scans]);
 
 
-  // Responsive sidebar behavior
+  // Responsive sidebar behavior and click outside to close
   useEffect(() => {
     if (!hasMounted) return;
-    
+
     const handleResize = () => {
       // Close sidebar on mobile when resizing down
       if (window.innerWidth < 768 && sidebarOpen) {
         setSidebarOpen(false);
       }
     };
-    
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        window.innerWidth < 768 &&
+        sidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setSidebarOpen(false);
+      }
+    };
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [hasMounted]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [hasMounted, sidebarOpen]);
 
   const startNewSession = () => {
     const id = crypto.randomUUID();
@@ -274,8 +290,17 @@ useEffect(() => {
         </button>
       )}
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-[59] md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <div
+        ref={sidebarRef}
         className={`fixed md:relative h-screen bg-[#111] border-r border-white/10 overflow-hidden transition-all duration-300 ease-in-out z-[60] ${
           sidebarOpen ? "w-72 p-4" : "w-0 p-0"
         }`}
