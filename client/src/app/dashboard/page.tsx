@@ -3,15 +3,16 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  MdPeople, 
-  MdSecurity, 
-  MdTrendingUp, 
+import {
+  MdPeople,
+  MdSecurity,
+  MdTrendingUp,
   MdSmartToy,
   MdPersonAdd,
   MdWarning,
   MdCheckCircle,
-  MdBarChart
+  MdBarChart,
+  MdSettings
 } from "react-icons/md";
 import Chart from "../components/Dashboard/chart/chart";
 
