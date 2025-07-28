@@ -3,6 +3,7 @@
 import styles from "../sidebar/sidebar.module.css";
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   MdDashboardCustomize,
   MdManageAccounts,
@@ -77,6 +78,20 @@ const menuItems = [
 ];
 
 export default function Sidebar() {
+    const router = useRouter();
+
+    const handleLogout = () => {
+        if (confirm("Are you sure you want to logout?")) {
+            // Clear any stored authentication data
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("userProfile");
+            sessionStorage.clear();
+            
+            // Redirect to login page
+            router.push("/login");
+        }
+    };
+
     return (
         <aside className={styles.container} aria-label="Admin Sidebar Navigation">
             <div className={styles.user}>
@@ -98,7 +113,13 @@ export default function Sidebar() {
               ))}
              </ul>
            </nav>
-           <button className={styles.logout} aria-label="Log out"><MdLogout />Logout</button>
+           <button 
+             className={styles.logout} 
+             aria-label="Log out"
+             onClick={handleLogout}
+           >
+             <MdLogout />Logout
+           </button>
         </aside>
     );
 }
