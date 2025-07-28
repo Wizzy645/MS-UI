@@ -50,7 +50,7 @@ const menuItems = [
       {
         title: "Blacklist & Whitelist",
         path: "/dashboard/security-lists",
-        icon: <MdBlockFlaky />,
+        icon: <MdBlock />,
       },
       {
         title: "AI Feedback & Training",
