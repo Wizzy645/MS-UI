@@ -13,7 +13,7 @@ import {
   MdSettings,
   MdLogout,
   MdPeople,
-  MdBlockFlaky,
+  MdBlock,
   MdAssignmentTurnedIn
 } from "react-icons/md";
 import MenuLink from "./menuLink/menuLink";
