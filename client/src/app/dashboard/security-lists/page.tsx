@@ -7,16 +7,19 @@ import {
   MdDelete,
   MdEdit,
   MdSearch,
-  MdBlockFlaky,
+  MdBlock,
   MdCheckCircle,
   MdLink,
   MdEmail,
   MdPhone,
   MdLocationOn,
-  MdMoreVert
+  MdMoreVert,
+  MdClose,
+  MdSave
 } from "react-icons/md";
 
-const securityLists = [
+// Mock security lists data
+const initialSecurityLists = [
   {
     id: "1",
     type: "URL",
@@ -91,13 +94,30 @@ const categories = [
   "Banking"
 ];
 
+interface SecurityListItem {
+  id: string;
+  type: string;
+  value: string;
+  listType: string;
+  reason: string;
+  addedBy: string;
+  dateAdded: string;
+  category: string;
+}
+
 export default function SecurityLists() {
+  const [securityLists, setSecurityLists] = useState<SecurityListItem[]>(initialSecurityLists);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("All");
   const [filterList, setFilterList] = useState("All");
   const [filterCategory, setFilterCategory] = useState("All Categories");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<SecurityListItem | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [showSuccessMessage, setShowSuccessMessage] = useState("");
   const [newItem, setNewItem] = useState({
     type: "URL",
     value: "",
@@ -116,6 +136,16 @@ export default function SecurityLists() {
     return matchesSearch && matchesType && matchesList && matchesCategory;
   });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + itemsPerPage);
+
+  const showMessage = (message: string) => {
+    setShowSuccessMessage(message);
+    setTimeout(() => setShowSuccessMessage(""), 3000);
+  };
+
   const handleSelectItem = (itemId: string) => {
     setSelectedItems(prev => 
       prev.includes(itemId) 
@@ -126,10 +156,124 @@ export default function SecurityLists() {
 
   const handleSelectAll = () => {
     setSelectedItems(
-      selectedItems.length === filteredItems.length 
+      selectedItems.length === paginatedItems.length 
         ? [] 
-        : filteredItems.map(item => item.id)
+        : paginatedItems.map(item => item.id)
     );
+  };
+
+  const handleBulkAction = (action: string) => {
+    const itemValues = securityLists.filter(item => selectedItems.includes(item.id)).map(item => item.value).join(", ");
+    
+    switch (action) {
+      case "delete":
+        if (confirm(`Are you sure you want to delete ${selectedItems.length} item(s)?`)) {
+          setSecurityLists(prev => prev.filter(item => !selectedItems.includes(item.id)));
+          showMessage(`Deleted ${selectedItems.length} item(s): ${itemValues}`);
+        }
+        break;
+      case "whitelist":
+        setSecurityLists(prev => prev.map(item => 
+          selectedItems.includes(item.id) ? { ...item, listType: "Whitelist" } : item
+        ));
+        showMessage(`Moved ${selectedItems.length} item(s) to whitelist: ${itemValues}`);
+        break;
+      case "blacklist":
+        setSecurityLists(prev => prev.map(item => 
+          selectedItems.includes(item.id) ? { ...item, listType: "Blacklist" } : item
+        ));
+        showMessage(`Moved ${selectedItems.length} item(s) to blacklist: ${itemValues}`);
+        break;
+    }
+    setSelectedItems([]);
+  };
+
+  const handleItemAction = (itemId: string, action: string) => {
+    const item = securityLists.find(i => i.id === itemId);
+    if (!item) return;
+
+    switch (action) {
+      case "edit":
+        setEditingItem(item);
+        setShowEditModal(true);
+        break;
+      case "delete":
+        if (confirm(`Are you sure you want to delete: ${item.value}?`)) {
+          setSecurityLists(prev => prev.filter(i => i.id !== itemId));
+          showMessage(`Deleted item: ${item.value}`);
+        }
+        break;
+    }
+  };
+
+  const validateInput = (value: string, type: string): boolean => {
+    switch (type) {
+      case "URL":
+        return value.includes(".") && value.length > 3;
+      case "Email":
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      case "Phone":
+        return value.length > 6;
+      case "IP":
+        return /^(\d{1,3}\.){3}\d{1,3}$/.test(value);
+      default:
+        return value.length > 0;
+    }
+  };
+
+  const handleAddItem = () => {
+    if (!newItem.value || !newItem.reason) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    if (!validateInput(newItem.value, newItem.type)) {
+      alert(`Please enter a valid ${newItem.type.toLowerCase()}`);
+      return;
+    }
+
+    const item: SecurityListItem = {
+      id: Date.now().toString(),
+      type: newItem.type,
+      value: newItem.value,
+      listType: newItem.listType,
+      reason: newItem.reason,
+      category: newItem.category,
+      addedBy: "admin.current",
+      dateAdded: new Date().toISOString().split('T')[0]
+    };
+
+    setSecurityLists(prev => [...prev, item]);
+    setShowAddModal(false);
+    setNewItem({
+      type: "URL",
+      value: "",
+      listType: "Blacklist", 
+      reason: "",
+      category: "Crypto Scam"
+    });
+    showMessage(`Added new ${item.listType.toLowerCase()} entry: ${item.value}`);
+  };
+
+  const handleEditItem = () => {
+    if (!editingItem) return;
+
+    if (!editingItem.value || !editingItem.reason) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    if (!validateInput(editingItem.value, editingItem.type)) {
+      alert(`Please enter a valid ${editingItem.type.toLowerCase()}`);
+      return;
+    }
+
+    setSecurityLists(prev => prev.map(item => 
+      item.id === editingItem.id ? editingItem : item
+    ));
+    setShowEditModal(false);
+    setEditingItem(null);
+    showMessage(`Updated item: ${editingItem.value}`);
   };
 
   const getTypeIcon = (type: string) => {
@@ -138,14 +282,14 @@ export default function SecurityLists() {
       case "Email": return <MdEmail className="text-green-400" />;
       case "Phone": return <MdPhone className="text-purple-400" />;
       case "IP": return <MdLocationOn className="text-orange-400" />;
-      default: return <MdBlockFlaky className="text-gray-400" />;
+      default: return <MdBlock className="text-gray-400" />;
     }
   };
 
   const getListBadge = (listType: string) => {
     return listType === "Blacklist" ? (
       <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400 border border-red-500/30 flex items-center gap-1">
-        <MdBlockFlaky size={12} />
+        <MdBlock size={12} />
         Blacklist
       </span>
     ) : (
@@ -156,21 +300,20 @@ export default function SecurityLists() {
     );
   };
 
-  const handleAddItem = () => {
-    // Simulate adding new item
-    console.log("Adding new item:", newItem);
-    setShowAddModal(false);
-    setNewItem({
-      type: "URL",
-      value: "",
-      listType: "Blacklist", 
-      reason: "",
-      category: "Crypto Scam"
-    });
-  };
-
   return (
     <main className="p-6 text-white min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+        >
+          {showSuccessMessage}
+        </motion.div>
+      )}
+
       {/* Header */}
       <header className="mb-8">
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -248,13 +391,22 @@ export default function SecurityLists() {
           >
             <span className="text-sm font-medium">{selectedItems.length} item(s) selected</span>
             <div className="flex gap-2">
-              <button className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition">
+              <button 
+                onClick={() => handleBulkAction("delete")}
+                className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition"
+              >
                 Delete Selected
               </button>
-              <button className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-sm transition">
+              <button 
+                onClick={() => handleBulkAction("whitelist")}
+                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-sm transition"
+              >
                 Move to Whitelist
               </button>
-              <button className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-sm transition">
+              <button 
+                onClick={() => handleBulkAction("blacklist")}
+                className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition"
+              >
                 Move to Blacklist
               </button>
             </div>
@@ -291,7 +443,7 @@ export default function SecurityLists() {
                 <th className="px-4 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
+                    checked={selectedItems.length === paginatedItems.length && paginatedItems.length > 0}
                     onChange={handleSelectAll}
                     className="rounded border-gray-300"
                   />
@@ -307,7 +459,7 @@ export default function SecurityLists() {
               </tr>
             </thead>
             <tbody>
-              {filteredItems.map((item, i) => (
+              {paginatedItems.map((item, i) => (
                 <motion.tr
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -349,14 +501,19 @@ export default function SecurityLists() {
                   <td className="px-4 py-3 text-sm text-gray-400">{item.dateAdded}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <button className="p-1 hover:bg-white/10 rounded transition" title="Edit">
+                      <button 
+                        onClick={() => handleItemAction(item.id, "edit")}
+                        className="p-1 hover:bg-white/10 rounded transition" 
+                        title="Edit"
+                      >
                         <MdEdit size={16} className="text-blue-400" />
                       </button>
-                      <button className="p-1 hover:bg-white/10 rounded transition" title="Delete">
+                      <button 
+                        onClick={() => handleItemAction(item.id, "delete")}
+                        className="p-1 hover:bg-white/10 rounded transition" 
+                        title="Delete"
+                      >
                         <MdDelete size={16} className="text-red-400" />
-                      </button>
-                      <button className="p-1 hover:bg-white/10 rounded transition">
-                        <MdMoreVert size={16} className="text-gray-400" />
                       </button>
                     </div>
                   </td>
@@ -364,6 +521,40 @@ export default function SecurityLists() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-6 text-sm text-gray-400">
+        <span>Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredItems.length)} of {filteredItems.length} entries</span>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 rounded transition ${
+                currentPage === page 
+                  ? "bg-blue-600 text-white" 
+                  : "bg-white/10 hover:bg-white/20"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         </div>
       </div>
 
@@ -375,7 +566,15 @@ export default function SecurityLists() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-slate-800 border border-white/20 rounded-xl p-6 max-w-md w-full mx-4"
           >
-            <h3 className="text-xl font-semibold mb-4">Add Security List Entry</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">Add Security List Entry</h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <MdClose size={24} />
+              </button>
+            </div>
             
             <div className="space-y-4">
               <div>
@@ -393,7 +592,7 @@ export default function SecurityLists() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Value</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Value *</label>
                 <input
                   type="text"
                   value={newItem.value}
@@ -429,7 +628,7 @@ export default function SecurityLists() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Reason</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Reason *</label>
                 <textarea
                   value={newItem.reason}
                   onChange={(e) => setNewItem({...newItem, reason: e.target.value})}
@@ -458,16 +657,102 @@ export default function SecurityLists() {
         </div>
       )}
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-6 text-sm text-gray-400">
-        <span>Showing {filteredItems.length} of {securityLists.length} entries</span>
-        <div className="flex gap-2">
-          <button className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded transition">Previous</button>
-          <button className="px-3 py-1 bg-blue-600 text-white rounded">1</button>
-          <button className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded transition">2</button>
-          <button className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded transition">Next</button>
+      {/* Edit Modal */}
+      {showEditModal && editingItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-800 border border-white/20 rounded-xl p-6 max-w-md w-full mx-4"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">Edit Security List Entry</h3>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <MdClose size={24} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
+                <select
+                  value={editingItem.type}
+                  onChange={(e) => setEditingItem({...editingItem, type: e.target.value})}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="URL">URL</option>
+                  <option value="Email">Email</option>
+                  <option value="Phone">Phone</option>
+                  <option value="IP">IP Address</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Value</label>
+                <input
+                  type="text"
+                  value={editingItem.value}
+                  onChange={(e) => setEditingItem({...editingItem, value: e.target.value})}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">List Type</label>
+                <select
+                  value={editingItem.listType}
+                  onChange={(e) => setEditingItem({...editingItem, listType: e.target.value})}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="Blacklist">Blacklist</option>
+                  <option value="Whitelist">Whitelist</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                <select
+                  value={editingItem.category}
+                  onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                >
+                  {categories.slice(1).map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Reason</label>
+                <textarea
+                  value={editingItem.reason}
+                  onChange={(e) => setEditingItem({...editingItem, reason: e.target.value})}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  rows={3}
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleEditItem}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-medium transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      )}
     </main>
   );
 }
