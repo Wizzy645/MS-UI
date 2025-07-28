@@ -1,32 +1,246 @@
-.container{
+/* Mobile-first responsive dashboard layout */
+.container {
     display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
-.menu{
-    flex: 1;
-    padding: 20px;
-    background-color: var(--bgSoft);
-}
-.content{
-    padding: 20px;
-    flex: 4;
-}
-.wrapper{
-    display: flex;
-    gap: 20px;
-    margin-top :20px;
 
+.menu {
+    flex: none;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    padding: 1.5rem;
 }
-.min{
- flex: 3;
- display: flex;
- flex-direction: column;
- gap: 20;
+
+.content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 0;
+    overflow-x: auto;
+    min-height: 100vh;
+    background: transparent;
 }
-.crd{
- display: flex;
- gap:20px;
- justify-content: space-between;
+
+.wrapper {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
 }
-.side{
- flex: 1;
+
+.main {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.cards {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.side {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* Mobile Menu Toggle */
+.menuToggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background: rgba(59, 130, 246, 0.9);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.menuToggle:hover {
+    background: rgba(59, 130, 246, 1);
+    transform: scale(1.05);
+}
+
+.menuOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+}
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .menu {
+        width: 250px;
+    }
+    
+    .content {
+        margin-left: 250px;
+    }
+    
+    .wrapper {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .cards {
+        gap: 1rem;
+    }
+    
+    .side {
+        min-width: auto;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .menu {
+        transform: translateX(-100%);
+        width: 280px;
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .menu.open {
+        transform: translateX(0);
+    }
+    
+    .content {
+        margin-left: 0;
+        padding-top: 4rem;
+    }
+    
+    .menuToggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .menuOverlay.show {
+        display: block;
+    }
+    
+    .wrapper {
+        margin-top: 1rem;
+        gap: 1rem;
+    }
+    
+    .cards {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .main {
+        gap: 1rem;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .menu {
+        width: 100vw;
+        padding: 1rem;
+    }
+    
+    .content {
+        padding-top: 3.5rem;
+    }
+    
+    .menuToggle {
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.625rem;
+    }
+    
+    .wrapper {
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+    
+    .cards {
+        gap: 0.75rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .menu {
+        display: none;
+    }
+    
+    .content {
+        margin-left: 0;
+        padding: 0;
+    }
+    
+    .menuToggle {
+        display: none;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .menu {
+        border-right-width: 0.5px;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .content {
+        padding-top: 3rem;
+    }
+    
+    .menuToggle {
+        top: 0.5rem;
+        left: 0.5rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .container {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .menu,
+    .menuToggle {
+        transition: none;
+    }
+}
+
+/* Focus styles for accessibility */
+.menuToggle:focus {
+    outline: 2px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 2px;
 }
