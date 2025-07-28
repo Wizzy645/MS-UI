@@ -5,103 +5,88 @@ import React from "react";
 import Image from "next/image";
 import {
   MdDashboardCustomize,
-  MdLink,
-  MdHistory,
   MdManageAccounts,
+  MdHistory,
+  MdSecurity,
+  MdSmartToy,
+  MdAnnouncement,
   MdSettings,
-  MdHelpOutline,
-  MdReportProblem,
   MdLogout,
-  MdOutlineShield,
-  MdOutlineUpgrade,
-  MdGroupAdd
+  MdPeople,
+  MdBlockFlaky,
+  MdAssignmentTurnedIn
 } from "react-icons/md";
 import MenuLink from "./menuLink/menuLink";
 
 const menuItems = [
   {
-    title: "Main",
+    title: "Overview",
     list: [
       {
         title: "Dashboard",
         path: "/dashboard",
         icon: <MdDashboardCustomize />,
       },
+    ],
+  },
+  {
+    title: "User Management",
+    list: [
       {
-        title: "Scan Link / Message",
-        path: "/dashboard/scan",
-        icon: <MdLink />,
-      },
-      {
-        title: "Scan History",
-        path: "/dashboard/history",
-        icon: <MdHistory />,
-      },
-      {
-        title: "AI Reports",
-        path: "/dashboard/reports",
-        icon: <MdOutlineShield />,
+        title: "Manage Users",
+        path: "/dashboard/users",
+        icon: <MdPeople />,
       },
     ],
   },
   {
-    title: "Account",
+    title: "Content & Security",
     list: [
       {
-        title: "My Profile",
-        path: "/dashboard/profile",
-        icon: <MdManageAccounts />,
+        title: "Scan Logs",
+        path: "/dashboard/scan-logs",
+        icon: <MdHistory />,
       },
       {
-        title: "Settings",
-        path: "/dashboard/settings",
+        title: "Blacklist & Whitelist",
+        path: "/dashboard/security-lists",
+        icon: <MdBlockFlaky />,
+      },
+      {
+        title: "AI Feedback & Training",
+        path: "/dashboard/ai-training",
+        icon: <MdSmartToy />,
+      },
+    ],
+  },
+  {
+    title: "System Administration",
+    list: [
+      {
+        title: "Announcements",
+        path: "/dashboard/announcements",
+        icon: <MdAnnouncement />,
+      },
+      {
+        title: "System Settings",
+        path: "/dashboard/admin-settings",
         icon: <MdSettings />,
       },
     ],
   },
-  {
-    title: "Trust & Safety",
-    list: [
-      {
-        title: "Report a Scam",
-        path: "/dashboard/report-scam",
-        icon: <MdReportProblem />,
-      },
-      {
-        title: "Help Center",
-        path: "/dashboard/help",
-        icon: <MdHelpOutline />,
-      },
-    ],
-  },
-  {
-    title: "Extras",
-    list: [
-      {
-        title: "Upgrade Plan",
-        path: "/dashboard/upgrade",
-        icon: <MdOutlineUpgrade />,
-      },
-      {
-        title: "Invite Friends",
-        path: "/dashboard/invite",
-        icon: <MdGroupAdd />,
-      },
-    ],
-  },
-
 ];
+
 export default function Sidebar() {
     return (
-        <aside className={styles.container} aria-label="Sidebar Navigation">
+        <aside className={styles.container} aria-label="Admin Sidebar Navigation">
             <div className={styles.user}>
-                <Image className={styles.userImage} src="/user-profile-avatar-png.webp" alt="User Avatar" width={50} height={50} />
+                <Image className={styles.userImage} src="/user-profile-avatar-png.webp" alt="Admin Avatar" width={50} height={50} />
                 <div className={styles.userDetail}>
-                    <span className={styles.username}>John Doe</span>
-                    <span className={styles.userTitle}>Administrator</span>
+                    <span className={styles.username}>Olamide Adesina</span>
+                    <span className={styles.userTitle}>Super Administrator</span>
                 </div>
             </div>
-           <nav role="navigation" aria-label="Main menu">
+           <nav role="navigation" aria-label="Admin menu">
              <ul className={styles.list}>
               {menuItems.map(cat => (
                   <li key={cat.title}>
