@@ -14,10 +14,13 @@ import {
   MdWarning,
   MdCheckCircle,
   MdInfo,
-  MdLabel
+  MdLabel,
+  MdClose,
+  MdDelete
 } from "react-icons/md";
 
-const disputedCases = [
+// Mock data
+const initialDisputedCases = [
   {
     id: "DIS-001",
     originalInput: "Congratulations! You've won $50,000 in our lottery. Click here to claim your prize now!",
@@ -53,7 +56,7 @@ const disputedCases = [
   }
 ];
 
-const trainingData = [
+const initialTrainingData = [
   {
     id: "TRN-001",
     category: "Romance Scam",
@@ -83,35 +86,145 @@ const trainingData = [
   }
 ];
 
-const modelStats = {
+const initialModelStats = {
   currentVersion: "v2.1.4",
   accuracy: "94.7%",
   lastTrained: "2024-03-14",
   trainingSamples: 12847,
-  pendingReviews: 23,
+  pendingReviews: 3,
   approvedFeedback: 156
 };
 
+interface DisputedCase {
+  id: string;
+  originalInput: string;
+  aiPrediction: string;
+  aiConfidence: string;
+  userFeedback: string;
+  userReason: string;
+  status: string;
+  submittedBy: string;
+  dateSubmitted: string;
+}
+
+interface TrainingDataItem {
+  id: string;
+  category: string;
+  content: string;
+  label: string;
+  confidence: string;
+  source: string;
+  dateAdded: string;
+}
+
 export default function AITraining() {
   const [activeTab, setActiveTab] = useState("disputed");
+  const [disputedCases, setDisputedCases] = useState<DisputedCase[]>(initialDisputedCases);
+  const [trainingData, setTrainingData] = useState<TrainingDataItem[]>(initialTrainingData);
+  const [modelStats, setModelStats] = useState(initialModelStats);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState("");
+  const [isRetraining, setIsRetraining] = useState(false);
   const [newSample, setNewSample] = useState({
     content: "",
     label: "Scam",
     category: "Crypto Scam",
     confidence: "High"
   });
-  const [showAddModal, setShowAddModal] = useState(false);
+
+  const showMessage = (message: string) => {
+    setShowSuccessMessage(message);
+    setTimeout(() => setShowSuccessMessage(""), 3000);
+  };
 
   const handleApproveForTraining = (caseId: string) => {
-    console.log("Approving case for training:", caseId);
+    const disputedCase = disputedCases.find(c => c.id === caseId);
+    if (!disputedCase) return;
+
+    // Update disputed case status
+    setDisputedCases(prev => prev.map(c => 
+      c.id === caseId ? { ...c, status: "Approved for Training" } : c
+    ));
+
+    // Add to training data
+    const newTrainingItem: TrainingDataItem = {
+      id: `TRN-${Date.now()}`,
+      category: "User Correction",
+      content: disputedCase.originalInput,
+      label: disputedCase.userFeedback,
+      confidence: "High",
+      source: "Disputed Case",
+      dateAdded: new Date().toISOString().split('T')[0]
+    };
+
+    setTrainingData(prev => [...prev, newTrainingItem]);
+    
+    // Update stats
+    setModelStats(prev => ({
+      ...prev,
+      pendingReviews: prev.pendingReviews - 1,
+      approvedFeedback: prev.approvedFeedback + 1,
+      trainingSamples: prev.trainingSamples + 1
+    }));
+
+    showMessage(`Approved case ${caseId} for training`);
   };
 
   const handleRejectCase = (caseId: string) => {
-    console.log("Rejecting case:", caseId);
+    setDisputedCases(prev => prev.map(c => 
+      c.id === caseId ? { ...c, status: "Rejected" } : c
+    ));
+
+    setModelStats(prev => ({
+      ...prev,
+      pendingReviews: prev.pendingReviews - 1
+    }));
+
+    showMessage(`Rejected case ${caseId}`);
+  };
+
+  const handleRetrainModel = async () => {
+    setIsRetraining(true);
+    
+    // Simulate model retraining
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    const newAccuracy = (parseFloat(modelStats.accuracy) + Math.random() * 2).toFixed(1) + "%";
+    const newVersion = `v2.1.${parseInt(modelStats.currentVersion.split('.')[2]) + 1}`;
+    
+    setModelStats(prev => ({
+      ...prev,
+      currentVersion: newVersion,
+      accuracy: newAccuracy,
+      lastTrained: new Date().toISOString().split('T')[0]
+    }));
+
+    setIsRetraining(false);
+    showMessage(`Model retrained successfully! New version: ${newVersion}, Accuracy: ${newAccuracy}`);
   };
 
   const handleAddTrainingSample = () => {
-    console.log("Adding training sample:", newSample);
+    if (!newSample.content.trim()) {
+      alert("Please enter content for the training sample");
+      return;
+    }
+
+    const sample: TrainingDataItem = {
+      id: `TRN-${Date.now()}`,
+      content: newSample.content,
+      label: newSample.label,
+      category: newSample.category,
+      confidence: newSample.confidence,
+      source: "Manual Input",
+      dateAdded: new Date().toISOString().split('T')[0]
+    };
+
+    setTrainingData(prev => [...prev, sample]);
+    setModelStats(prev => ({
+      ...prev,
+      trainingSamples: prev.trainingSamples + 1
+    }));
+
     setShowAddModal(false);
     setNewSample({
       content: "",
@@ -119,6 +232,61 @@ export default function AITraining() {
       category: "Crypto Scam",
       confidence: "High"
     });
+    showMessage(`Added new training sample: ${sample.id}`);
+  };
+
+  const handleDeleteTrainingSample = (sampleId: string) => {
+    if (confirm("Are you sure you want to delete this training sample?")) {
+      setTrainingData(prev => prev.filter(sample => sample.id !== sampleId));
+      setModelStats(prev => ({
+        ...prev,
+        trainingSamples: prev.trainingSamples - 1
+      }));
+      showMessage(`Deleted training sample: ${sampleId}`);
+    }
+  };
+
+  const handleBulkUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv,.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Simulate bulk upload
+        const newSampleCount = Math.floor(Math.random() * 50) + 10;
+        setModelStats(prev => ({
+          ...prev,
+          trainingSamples: prev.trainingSamples + newSampleCount
+        }));
+        showMessage(`Bulk uploaded ${newSampleCount} training samples from ${file.name}`);
+      }
+    };
+    input.click();
+  };
+
+  const handleExportData = () => {
+    const csvContent = [
+      ["ID", "Category", "Content", "Label", "Confidence", "Source", "Date Added"].join(","),
+      ...trainingData.map(sample => [
+        sample.id,
+        sample.category,
+        `"${sample.content.replace(/"/g, '""')}"`,
+        sample.label,
+        sample.confidence,
+        sample.source,
+        sample.dateAdded
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ai-training-data-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showMessage("Training data exported successfully");
   };
 
   const getStatusBadge = (status: string) => {
@@ -150,6 +318,18 @@ export default function AITraining() {
 
   return (
     <main className="p-6 text-white min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+        >
+          {showSuccessMessage}
+        </motion.div>
+      )}
+
       {/* Header */}
       <header className="mb-8">
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -188,9 +368,13 @@ export default function AITraining() {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 mb-6">
-        <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition">
-          <MdRefresh size={20} />
-          Retrain Model
+        <button 
+          onClick={handleRetrainModel}
+          disabled={isRetraining}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <MdRefresh size={20} className={isRetraining ? "animate-spin" : ""} />
+          {isRetraining ? "Retraining..." : "Retrain Model"}
         </button>
         <button 
           onClick={() => setShowAddModal(true)}
@@ -199,11 +383,17 @@ export default function AITraining() {
           <MdAdd size={20} />
           Add Training Sample
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium transition">
+        <button 
+          onClick={handleBulkUpload}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium transition"
+        >
           <MdUpload size={20} />
           Bulk Upload
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition">
+        <button 
+          onClick={handleExportData}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg font-medium transition"
+        >
           <MdDownload size={20} />
           Export Data
         </button>
@@ -222,7 +412,7 @@ export default function AITraining() {
           >
             <span className="flex items-center gap-2">
               <MdWarning size={18} />
-              Disputed Cases ({disputedCases.length})
+              Disputed Cases ({disputedCases.filter(c => c.status === "Pending Review").length})
             </span>
           </button>
           <button
@@ -324,6 +514,7 @@ export default function AITraining() {
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Confidence</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Source</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Date Added</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -359,6 +550,15 @@ export default function AITraining() {
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-400">{sample.source}</td>
                         <td className="px-4 py-3 text-sm text-gray-400">{sample.dateAdded}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => handleDeleteTrainingSample(sample.id)}
+                            className="p-1 hover:bg-white/10 rounded transition"
+                            title="Delete sample"
+                          >
+                            <MdDelete size={16} className="text-red-400" />
+                          </button>
+                        </td>
                       </motion.tr>
                     ))}
                   </tbody>
@@ -377,14 +577,22 @@ export default function AITraining() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-slate-800 border border-white/20 rounded-xl p-6 max-w-2xl w-full mx-4"
           >
-            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <MdLabel />
-              Add Training Sample
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <MdLabel />
+                Add Training Sample
+              </h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <MdClose size={24} />
+              </button>
+            </div>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Content</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Content *</label>
                 <textarea
                   value={newSample.content}
                   onChange={(e) => setNewSample({...newSample, content: e.target.value})}
