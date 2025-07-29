@@ -243,7 +243,7 @@ export default function AdminSettings() {
           {[
             { id: "general", label: "General", icon: <MdSettings /> },
             { id: "security", label: "Security", icon: <MdSecurity /> },
-            { id: "ai", label: "AI & ML", icon: <MdDatabase /> },
+            { id: "ai", label: "AI & ML", icon: <MdDataset /> },
             { id: "notifications", label: "Notifications", icon: <MdMonitorHeart /> },
             { id: "performance", label: "Performance", icon: <MdApi /> },
             { id: "audit", label: "Audit Logs", icon: <MdBackup /> }
