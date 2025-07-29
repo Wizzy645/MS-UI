@@ -34,10 +34,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserProvider>
-          <ParticleBackground />
-          {children}
-        </UserProvider>
+        <ErrorBoundary>
+          <UserProvider>
+            <ParticleBackground />
+            {children}
+          </UserProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
