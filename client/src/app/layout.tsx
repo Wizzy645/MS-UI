@@ -36,6 +36,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ErrorBoundary>
+          <PreventMetaMask />
           <UserProvider>
             <ParticleBackground />
             {children}
