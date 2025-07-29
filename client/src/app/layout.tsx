@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 import ParticleBackground from "./components/ParticleBackground";
 import { UserProvider } from "./context/UserContext";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PreventMetaMask from "./components/PreventMetaMask";
 
 export default function RootLayout({
   children,
